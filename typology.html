@@ -1510,26 +1510,9 @@ div.tocify {
 </div>
 
 
-<pre class="r"><code># load libraries
-
-options(scipen = 999)
-library(RPostgreSQL)
-library(rpostgis)
-library(data.table)
-library(sf)
-library(dplyr)
-library(foreign)
-library(tidycensus)
-library(data.table)
-
-census_root &lt;- &quot;W:/Project/RDA Team/Census2020/data/&quot;
-cb_root &lt;- &quot;W:/Base/CBF/census_2018_cartographic_boundary_files/&quot;
-covidroot &lt;- &quot;W:/Project/RDA Team/COVID Census 2020/data/&quot;</code></pre>
-<pre class="r"><code># covid_resp &lt;- st_read(paste0(covidroot, &quot;covid_dem_resp.shp&quot;))
-
-covid_dat &lt;-  fread(paste0(covidroot, &quot;covid_dem_resp.csv&quot;), stringsAsFactors = FALSE, data.table = FALSE)</code></pre>
 <div id="review-data" class="section level3">
 <h3>Review data</h3>
+<p>Review the median/mean of HTC scores and COVID cases per 100k per neighborhood</p>
 <pre class="r"><code># go for median 
 summary(covid_dat$mean_htc)</code></pre>
 <pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA&#39;s 
