@@ -1513,13 +1513,18 @@ div.tocify {
 <div id="review-data" class="section level3">
 <h3>Review data</h3>
 <p>Review the median/mean of HTC scores and COVID cases per 100k per neighborhood</p>
-<pre class="r"><code># go for median 
-summary(covid_dat$mean_htc)</code></pre>
-<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max.    NA&#39;s 
-##    1.00   26.02   43.80   46.45   63.92  112.00      12</code></pre>
-<pre class="r"><code>summary(covid_dat$cases_per100k)</code></pre>
-<pre><code>##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
-##   24.05  136.65  202.93  234.15  296.72 2780.30</code></pre>
+<pre><code>##   Median     Mean 
+## 43.80000 46.44681</code></pre>
+<p>Median &amp; Mean of mean neigbhorhood HTC scores:</p>
+<ul>
+<li>Half of neighborhoods have a mean HTC score below 43.8, half of neighborhoods have a mean HTC score above 43.8.</li>
+</ul>
+<pre><code>##   Median     Mean 
+## 202.9317 234.1473</code></pre>
+<p>Median &amp; Mean of confirmed COVID-19 cases per 100k residents:</p>
+<ul>
+<li>Half of neighborhoods have more than 202.93 COVID-19 cases per 100k residents.</li>
+</ul>
 </div>
 <div id="create-typology" class="section level2">
 <h2>Create typology</h2>
@@ -1532,18 +1537,10 @@ summary(covid_dat$mean_htc)</code></pre>
 </li>
 <li>If the neighborhood COVD-19 cases per 100k is at or below the median –&gt; Low COVID</li>
 </ul>
-<pre class="r"><code>covid_dat &lt;- 
-covid_dat %&gt;% 
-  mutate(htc_typ = ifelse(mean_htc &gt; 43.8, &quot;High HTC&quot;, &quot;Low HTC&quot;),
-         covid_typ = ifelse(cases_per100k &gt; 202.93, &quot;High COVID&quot;, &quot;Low COVID&quot;),
-         typ = paste0(htc_typ, &quot;, &quot;, covid_typ))
-
-table(covid_dat$htc_typ, covid_dat$latino_quantiles) # k cool that is what i would expect</code></pre>
 <pre><code>##           
 ##             1  2  3  4
 ##   High HTC 59 50 20 12
 ##   Low HTC  14 20 50 57</code></pre>
-<pre class="r"><code>table(covid_dat$covid_typ, covid_dat$latino_quantiles)</code></pre>
 <pre><code>##             
 ##               1  2  3  4
 ##   High COVID 47 48 30 22
