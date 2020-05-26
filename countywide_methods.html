@@ -1591,7 +1591,6 @@ div.tocify {
 
 <h1 class="title toc-ignore">Countywide Town Hall Report - Data Prep &amp; Methods</h1>
 <h4 class="author">LD</h4>
-<h4 class="date">5/19/2020</h4>
 
 </div>
 
@@ -1655,6 +1654,9 @@ div.tocify {
 <a class="sourceLine" id="cb1-56" title="56"></a>
 <a class="sourceLine" id="cb1-57" title="57"><span class="co"># query only LA Co, keep only columns with tract id and HTC score &amp; top 3 attributes contributing to HTC score</span></a>
 <a class="sourceLine" id="cb1-58" title="58">htc &lt;-<span class="st"> </span>htc[htc<span class="op">$</span>county_fip<span class="op">==</span><span class="st">&quot;037&quot;</span>, <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">17</span>, <span class="dv">41</span><span class="op">:</span><span class="dv">43</span>)]</a></code></pre></div>
+<div id="data-as-of-2020-05-26" class="section level4">
+<h4>Data as of 2020-05-26</h4>
+</div>
 <div id="summarize-htc-by-neighborhood" class="section level2">
 <h2>Summarize HTC by neighborhood</h2>
 <p>Get mean HTC of tracts by neighborhood.</p>
@@ -1743,10 +1745,10 @@ div.tocify {
 ##   &lt;chr&gt;       &lt;chr&gt;           &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;
 ## 1 Antelope V~ Ange~            26.6              209     34          NA
 ## 2 Santa Clar~ Nort~            29.2              405     30          NA
-## 3 South LA    Univ~            32.1             3830     96.7         7
-## 4 Central LA  Down~            33.9            18705     91.6        13
-## 5 South LA    Hist~            34.2             7352     98.8        12
-## 6 West LA     Mali~            34.7             3767     20          NA
+## 3 South LA    Univ~            32.3             3818     96.7         7
+## 4 Central LA  Down~            34.1            18655     91.6        13
+## 5 South LA    Hist~            34.4             7322     98.8        12
+## 6 West LA     Mali~            34.8             3761     20          NA
 ## # ... with 5 more variables: rank_resp &lt;dbl&gt;, rank_htc &lt;dbl&gt;,
 ## #   rank_cnthtc &lt;dbl&gt;, rank_uncthh &lt;int&gt;, rank_tot &lt;dbl&gt;</code></pre>
 </div>
@@ -1778,12 +1780,12 @@ div.tocify {
 ## # Groups:   region_name [2]
 ##   region_name NAME  `Response Rate` `Uncounted Hous~ mean_htc count_htc
 ##   &lt;chr&gt;       &lt;chr&gt;           &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;
-## 1 Central LA  Down~            33.9            18705     91.6        13
-## 2 South LA    Hist~            34.2             7352     98.8        12
-## 3 South LA    Cent~            37.5             6159     90.7        10
-## 4 Central LA  Pico~            38.3             8530    103.         14
-## 5 Central LA  West~            42              22118    102.         29
-## 6 Central LA  Holl~            42.1            22234     81.9        21
+## 1 Central LA  Down~            34.1            18655     91.6        13
+## 2 South LA    Hist~            34.4             7322     98.8        12
+## 3 South LA    Cent~            37.6             6145     90.7        10
+## 4 Central LA  Pico~            38.6             8491    103.         14
+## 5 Central LA  Holl~            42.2            22170     81.9        21
+## 6 Central LA  West~            42.2            22039    102.         29
 ## # ... with 5 more variables: rank_resp &lt;dbl&gt;, rank_htc &lt;dbl&gt;,
 ## #   rank_cnthtc &lt;dbl&gt;, rank_uncthh &lt;int&gt;, rank_tot &lt;dbl&gt;</code></pre>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># code broader neighborhood groups</span></a>
@@ -1967,21 +1969,21 @@ div.tocify {
 ## 82       1823.5 0.459578893 2085.93478 0.479577260 0.77825557    106114
 ## 6757      877.5 0.234063745  966.16880 0.240408875 0.37295923    106114
 ##      resp2020_converted.x     date.x neighbrhd_name    NAME htc region
-## 81                  0.501 2020-05-11         Sylmar 1061.14  69      6
-## 82                  0.501 2020-05-11         Sylmar 1061.14  69      6
-## 6757                0.501 2020-05-11         Sylmar 1061.14  69      6
+## 81                  0.505 2020-05-13         Sylmar 1061.14  69      6
+## 82                  0.505 2020-05-13         Sylmar 1061.14  69      6
+## 6757                0.505 2020-05-13         Sylmar 1061.14  69      6
 ##              region_name GEOID_city        city resp_house10
 ## 81   San Fernando Valley     644000 Los Angeles       819.88
 ## 82   San Fernando Valley     644000 Los Angeles       819.88
 ## 6757 San Fernando Valley     644000 Los Angeles       819.88
 ##      resp10_house10 housecur house10 resp2020_converted.y     date.y
-## 81             1047     1592    1500                0.515 2020-05-22
-## 82             1047     1592    1500                0.515 2020-05-22
-## 6757           1047     1592    1500                0.515 2020-05-22
+## 81             1047     1592    1500                0.515 2020-05-26
+## 82             1047     1592    1500                0.515 2020-05-26
+## 6757           1047     1592    1500                0.515 2020-05-26
 ##      resp2010_converted resp10_20_diff_converted prc_change difference
-## 81                0.698                   -0.183 0.02794411      0.014
-## 82                0.698                   -0.183 0.02794411      0.014
-## 6757              0.698                   -0.183 0.02794411      0.014
+## 81                0.698                   -0.183 0.01980198       0.01
+## 82                0.698                   -0.183 0.01980198       0.01
+## 6757              0.698                   -0.183 0.01980198       0.01
 ##      gq_pop_est gq_pop_pct uncounted_hh
 ## 81            6 0.09360374          772
 ## 82            6 0.09360374          772
@@ -2029,40 +2031,40 @@ div.tocify {
 ## 5        663 0.170231264 1133.44075 0.269902728 0.54271560    101400
 ## 6        663 0.170231264 1133.44075 0.269902728 0.54271560    102103
 ##   resp2020_converted.x     date.x neighbrhd_name    NAME htc region
-## 1                0.545 2020-05-11        Tujunga 1011.10  48      6
-## 2                0.600 2020-05-11        Tujunga 1011.22  13      6
-## 3                0.510 2020-05-11        Tujunga 1013.00  15      6
-## 4                0.384 2020-05-11        Tujunga 1014.00  27      6
-## 5                0.384 2020-05-11        Tujunga 1014.00  27      6
-## 6                0.606 2020-05-11   Shadow Hills 1021.03  24      6
+## 1                0.548 2020-05-13        Tujunga 1011.10  48      6
+## 2                0.600 2020-05-13        Tujunga 1011.22  13      6
+## 3                0.511 2020-05-13        Tujunga 1013.00  15      6
+## 4                0.386 2020-05-13        Tujunga 1014.00  27      6
+## 5                0.386 2020-05-13        Tujunga 1014.00  27      6
+## 6                0.610 2020-05-13   Shadow Hills 1021.03  24      6
 ##           region_name GEOID_city        city resp_house10 resp10_house10
-## 1 San Fernando Valley     644000 Los Angeles      888.972       1209.417
-## 2 San Fernando Valley     644000 Los Angeles      757.368       1017.600
+## 1 San Fernando Valley     644000 Los Angeles      890.568       1209.417
+## 2 San Fernando Valley     644000 Los Angeles      758.624       1017.600
 ## 3 San Fernando Valley     644000 Los Angeles      739.025       1190.424
-## 4 San Fernando Valley     644000 Los Angeles      574.470       1123.500
-## 5 San Fernando Valley     644000 Los Angeles      574.470       1123.500
-## 6 San Fernando Valley     644000 Los Angeles      429.432        452.970
+## 4 San Fernando Valley     644000 Los Angeles      575.943       1123.500
+## 5 San Fernando Valley     644000 Los Angeles      575.943       1123.500
+## 6 San Fernando Valley     644000 Los Angeles      430.824        452.970
 ##   housecur house10 resp2020_converted.y     date.y resp2010_converted
-## 1     1596    1641                0.557 2020-05-22              0.737
-## 2     1256    1325                0.603 2020-05-22              0.768
-## 3     1435    1542                0.515 2020-05-22              0.772
-## 4     1473    1498                0.390 2020-05-22              0.750
-## 5     1473    1498                0.390 2020-05-22              0.750
-## 6      696     630                0.617 2020-05-22              0.719
+## 1     1596    1641                0.558 2020-05-26              0.737
+## 2     1256    1325                0.604 2020-05-26              0.768
+## 3     1435    1542                0.515 2020-05-26              0.772
+## 4     1473    1498                0.391 2020-05-26              0.750
+## 5     1473    1498                0.391 2020-05-26              0.750
+## 6      696     630                0.619 2020-05-26              0.719
 ##   resp10_20_diff_converted  prc_change difference gq_pop_est gq_pop_pct
-## 1                   -0.180 0.022018349      0.012         95  2.2021326
-## 2                   -0.165 0.005000000      0.003          5  0.1543686
-## 3                   -0.257 0.009803922      0.005         47  1.0937864
-## 4                   -0.360 0.015625000      0.006         24  0.6232147
-## 5                   -0.360 0.015625000      0.006         24  0.6232147
-## 6                   -0.102 0.018151815      0.011          0  0.0000000
+## 1                   -0.179 0.018248175      0.010         95  2.2021326
+## 2                   -0.164 0.006666667      0.004          5  0.1543686
+## 3                   -0.257 0.007827789      0.004         47  1.0937864
+## 4                   -0.359 0.012953368      0.005         24  0.6232147
+## 5                   -0.359 0.012953368      0.005         24  0.6232147
+## 6                   -0.100 0.014754098      0.009          0  0.0000000
 ##   uncounted_hh
-## 1          707
-## 2          499
+## 1          705
+## 2          497
 ## 3          696
-## 4          899
-## 5          899
-## 6          267</code></pre>
+## 4          897
+## 5          897
+## 6          265</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co">### set up lep demog -- summarize to get lep by tract then select only tracts with higher than average lep</span></a>
 <a class="sourceLine" id="cb21-2" title="2">lep_quint &lt;-<span class="st"> </span></a>
 <a class="sourceLine" id="cb21-3" title="3">demog <span class="op">%&gt;%</span><span class="st"> </span></a>
@@ -2095,17 +2097,17 @@ div.tocify {
 <pre><code>##           GEOID value        subject estimate      prc median_est
 ## 814 06037219800 Black Race-Ethnicity      546 0.194306        150
 ##     median_prc mean_est  mean_prc  quintile TRACTCE10 resp2020_converted.x
-## 814 0.03771088 351.2306 0.0802483 0.1115769    219800                0.449
+## 814 0.03771088 351.2306 0.0802483 0.1115769    219800                 0.45
 ##         date.x neighbrhd_name NAME htc region region_name GEOID_city
-## 814 2020-05-11     West Adams 2198  79     10    South LA     644000
+## 814 2020-05-13     West Adams 2198  79     10    South LA     644000
 ##            city resp_house10 resp10_house10 housecur house10
-## 814 Los Angeles      452.962         628.32      989     952
+## 814 Los Angeles      453.951         628.32      989     952
 ##     resp2020_converted.y     date.y resp2010_converted
-## 814                0.458 2020-05-22               0.66
+## 814                0.459 2020-05-26               0.66
 ##     resp10_20_diff_converted prc_change difference gq_pop_est gq_pop_pct
-## 814                   -0.202 0.02004454      0.009          5  0.1779359
+## 814                   -0.201       0.02      0.009          5  0.1779359
 ##     uncounted_hh
-## 814          536</code></pre>
+## 814          535</code></pre>
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="co"># in this tract in West Adams/South LA, there are higher than average Black,Latinx, foreign born and LEP pop shares</span></a>
 <a class="sourceLine" id="cb23-2" title="2"></a>
 <a class="sourceLine" id="cb23-3" title="3"><span class="co">### Export the combined race/fb/lep demographic tract table -- WHERE TRACTS ARE IN TOP QUINTILE</span></a>
