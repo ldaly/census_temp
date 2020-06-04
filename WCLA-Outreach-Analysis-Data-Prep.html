@@ -364,7 +364,7 @@ summary {
 
 <h1 class="title toc-ignore">WCLA Outreach Analysis - Data Prep</h1>
 <h4 class="author">LD</h4>
-<h4 class="date">6/03/2020</h4>
+<h4 class="date">6/04/2020</h4>
 
 </div>
 
@@ -382,7 +382,6 @@ root &lt;- &quot;W:/Project/RDA Team/Census2020/data/&quot;
 
 cb_root &lt;- &quot;W:/Base/CBF/census_2018_cartographic_boundary_files/&quot;
 
-
 # load spatial  tract data 
 tractsp &lt;- st_read(paste0(cb_root, &quot;cb_2018_06_tract_500k/cb_2018_06_tract_500k.shp&quot;), stringsAsFactors = FALSE)</code></pre>
 <pre><code>## Reading layer `cb_2018_06_tract_500k&#39; from data source `W:\Base\CBF\census_2018_cartographic_boundary_files\cb_2018_06_tract_500k\cb_2018_06_tract_500k.shp&#39; using driver `ESRI Shapefile&#39;
@@ -396,30 +395,6 @@ tractsp &lt;- st_read(paste0(cb_root, &quot;cb_2018_06_tract_500k/cb_2018_06_tra
 tractsp &lt;- tractsp[tractsp$COUNTYFP ==&quot;037&quot;,]
 
 
-# # load current response rate data
-# resp &lt;- fread(paste0(root, &quot;web_map/selfresp_tract_converted_refresh.csv&quot;), data.table=FALSE, stringsAsFactors = FALSE,
-#               colClasses = c(&quot;GEOID10&quot;=&quot;character&quot;))
-# 
-# # limit to LA
-# resp &lt;- resp[resp$GEOID10 %like% &quot;06037&quot;, ]
-# 
-# resp_old  &lt;- fread(paste0(root, &quot;self_response/selfresp_tract_converted_2020-05-03.csv&quot;), data.table=FALSE, stringsAsFactors = FALSE,
-#               colClasses = c(&quot;GEOID10&quot;=&quot;character&quot;))
-# 
-# # limit to LA
-# resp_old &lt;- resp_old[resp_old$GEOID10 %like% &quot;06037&quot;, ]
-
-# read in polygon outreach data/
-outreach_poly &lt;- fread(paste0(root, &quot;State Census Office/Outreach/download_20200528/Polygon layer_0.csv&quot;), 
-                  data.table=FALSE, stringsAsFactors = FALSE,
-                  colClasses = c(&quot;tract&quot;=&quot;character&quot;))
-
-
-# read in polygon outreach data/
-outreach_pnt &lt;- fread(paste0(root, &quot;State Census Office/Outreach/download_20200528/surveyPoint_0.csv&quot;), 
-                       data.table=FALSE, stringsAsFactors = FALSE,
-                      colClasses = c(&quot;x&quot;=&quot;numeric&quot;, &quot;y&quot;=&quot;numeric&quot;))
-
 # read in state dbf of htc data
 htc &lt;- read.dbf(paste0(root, &quot;State Census Office/CA_HTC_2020Update.dbf&quot;))
 htc$GEOID_1 &lt;- as.character(htc$GEOID_1)
@@ -430,7 +405,20 @@ htc &lt;- htc[htc$county_fip==&quot;037&quot;, c(3, 17, 41:43)]
 
 regs &lt;- read.dbf(paste0(root, &quot;data_transfer/la_htc_tract_region_2020_intermed.dbf&quot;))
 regs &lt;- regs[,c(1, 3, 4, 5)]
-regs$geoid &lt;- as.character(regs$geoid)</code></pre>
+regs$geoid &lt;- as.character(regs$geoid)
+
+
+#### OUTREACH DATA ####
+# read in polygon outreach data/
+outreach_poly &lt;- fread(paste0(root, &quot;State Census Office/Outreach/download_20200604/Polygon layer_0.csv&quot;), 
+                  data.table=FALSE, stringsAsFactors = FALSE,
+                  colClasses = c(&quot;tract&quot;=&quot;character&quot;))
+
+
+# read in polygon outreach data/
+outreach_pnt &lt;- fread(paste0(root, &quot;State Census Office/Outreach/download_20200604/surveyPoint_0.csv&quot;), 
+                       data.table=FALSE, stringsAsFactors = FALSE,
+                      colClasses = c(&quot;x&quot;=&quot;numeric&quot;, &quot;y&quot;=&quot;numeric&quot;))</code></pre>
 </div>
 <div id="clean-up-outreach-data" class="section level3">
 <h3>Clean up outreach data</h3>
@@ -442,7 +430,13 @@ outreach_poly &lt;- outreach_poly[outreach_poly$tract %like% &quot;6037&quot; | 
 outreach_poly$tract &lt;- paste0(&quot;0&quot;, outreach_poly$tract)
 
 # clean up date field
-outreach_poly$start_activity_date &lt;- gsub(&quot; 0:00&quot;, &quot;&quot;, outreach_poly$`Date of Activity / Start Date`)
+outreach_poly$start_activity_date &lt;- ifelse( outreach_poly$`Date of Activity / Start Date` %like% &quot; 0:00&quot;,
+                                             gsub(&quot; 0:00&quot;, &quot;&quot;, outreach_poly$`Date of Activity / Start Date`),
+                                      ifelse( outreach_poly$`Date of Activity / Start Date` %like% &quot; 12:00:00 AM&quot;,
+                                              gsub(&quot; 12:00:00 AM&quot;, &quot;&quot;, outreach_poly$`Date of Activity / Start Date`), 
+                                              outreach_poly$`Date of Activity / Start Date`))
+
+#table(outreach_poly$start_activity_date)
 
 # add total houses reached to the impressions data
 # if total # impressions is NA and total # houses is NOT NA, use the total # of houses (this is the only field with data when impressions is NA)
@@ -461,12 +455,18 @@ outreach_poly$month &lt;- stri_match_first_regex(outreach_poly$start_activity_da
                               
 # make a geographic level field
 outreach_poly$level &lt;- ifelse(outreach_poly$`Exact Address` %like% &quot;Los Angeles County&quot;, &quot;county&quot;, &quot;tract&quot;)
-
 table(outreach_poly$level, useNA = &quot;always&quot;)</code></pre>
 <pre><code>## 
 ## county  tract   &lt;NA&gt; 
-##    419  10662      0</code></pre>
-<pre class="r"><code># dim(outreach_poly)
+##    547  17455      0</code></pre>
+<pre class="r"><code># clean up activity type. if activity is other, input other fields
+outreach_poly$activity &lt;- ifelse(outreach_poly$`Activity Type` ==&quot;activity_type_other&quot; &amp; 
+                                   (!is.na(outreach_poly$`Other - Activity Type`) &amp; outreach_poly$`Other - Activity Type` != &quot;&quot;),
+                                 outreach_poly$`Other - Activity Type`,
+                                 outreach_poly$`Activity Type`)
+
+# table(outreach_poly$activity, useNA = &quot;always&quot;)
+# dim(outreach_poly)
 
 
 ### clean up outreach point data
@@ -488,7 +488,7 @@ outreach_pnt$start_activity_date &lt;- ifelse(outreach_pnt$`Date of Activity / S
                                            gsub(&quot; 12:00:00 AM&quot;, &quot;&quot;, outreach_pnt$`Date of Activity / Start Date`),
                                            outreach_pnt$`Date of Activity / Start Date`)))))
                                            
-# table(outreach_pnt$start_activity_date)
+# table(outreach_pnt$start_activity_date) # VERIFY
 
 # add total houses reached to the impressions data
 # if total # impressions is NA make the count of impressions 1 (no other number to estimate) (no other field has data when impressions is NA)
@@ -502,7 +502,15 @@ outreach_pnt$month &lt;- stri_match_first_regex(outreach_pnt$start_activity_date
 table(outreach_pnt$month, useNA = &quot;always&quot;)</code></pre>
 <pre><code>## 
 ##    1   10   11   12    2    3    4    5    6    7    8    9 &lt;NA&gt; 
-##   78   65   82   83   97   51   87   29   10   13   19   37    0</code></pre>
+##   83   65   82   83  105   59   88   55   10   13   19   37    0</code></pre>
+<pre class="r"><code># clean up activity type. if activity is other, input other fields
+outreach_pnt$activity &lt;- ifelse(outreach_pnt$`Activity Type` ==&quot;activity_type_other&quot; &amp; 
+                                  (!is.na(outreach_pnt$`Other - Activity Type`) &amp; outreach_pnt$`Other - Activity Type` != &quot;&quot;),
+                                 outreach_pnt$`Other - Activity Type`,
+                                 outreach_pnt$`Activity Type`)
+
+# verify
+# table(outreach_pnt$activity, useNA = &quot;always&quot;)</code></pre>
 </div>
 <div id="spatial-join-points-to-tracts" class="section level3">
 <h3>Spatial join points to tracts</h3>
@@ -514,7 +522,7 @@ outreach_pnt_sp &lt;-  st_as_sf(outreach_pnt, coords = c(&quot;x&quot;, &quot;y&
 
 # test plot
 plot(outreach_pnt_sp$geometry)</code></pre>
-<p><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAABUAAAAPACAMAAADDuCPrAAAABlBMVEUAAAD///+l2Z/dAAAACXBIWXMAAB2HAAAdhwGP5fFlAAAgAElEQVR4nO3djZaiSLaAUXz/l57VUynELwZHEJG917o9lCJgG/ndAMzq6QFAyHT2AQBclYACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCAAgQJKECQgAIECShAkIACBAkoQJCA8iOmP2cfB3diuPEbpklB+TijjZ8wh1NB+SCDjV+QzD4FlM8x2PgB2fm7gvIxxhqXN6UElA8y1ri6SUA5i7HGxSXhnP7+7+xD4jaMNa6tuPgpoHySsca1/Zt2zhn1TVA+yVjj2hoBPfuQuA+DjWsrbiEJKJ9ksHFtyS0kv8rJpxltXFtyC0lA+TSjjWt7fnnpb1lA+SSjjWub8rtI+sknGW5cXFnQs4+HOzHcuLj8NrwBzScZb1ycfnIeA46LS6opoHyYAcfFLfNO/eTTjDiuzhk8pzHiuDz95CyGHJenn5zFmOPqTEA5jTHHxbmHxHkMOa4t+xbTmQfCHRlyXFtaTQXlw4w4rk1AOZERx7UJKCcy4rg2AeVERhzXJqCcyIjj2gSUExlxXJuvMXEiQ46L80V6zmPIcXV+lZPTGHNcnn5yFoMOIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQPkV/lpQPs5o40f4i+n5PION3+A/jcQJjDV+gv84J2cw1vgJ/vPwnMFQ4ycIKGcw1PgJAsoZDDV+goByBkONnyCgnMFQ4ycIKGcw1PgJvsbEGYw1foMv0nMCY42LmypnHxH3YbBxbfrJiYw2Lk05OZNBx5V1pp6SymcYYlxZeusovQ+voHyEEcaFFdEsH1VQDmaAcWFpIVvZNBHlWIYWF9YIaNpMp/IczMjiwuqA1t9qUlCOY2BxYVVA//uHgPIxBhYXlt96n/v5fGp++hlXLWVfRhMXlgTxr5GPNJrpsy6IcgCDiQsrz9LTP0zVH+bXnHrM/BJjiSvrBjS/FFqd68MujCUuLT8xr9O5/Dl9zVlHy68xlLi2op+P4ux9KWj6krMOll9jKPE7ngFdCjo/KKAcwVDidyTn6uV5vYByBEOJ31FXM7/HNK921gHyawwlfkfv15AElIMYSvyO8gZS++9b1k92YyzxO/Lrn/ndpLmgk4CyG2OJ35FNM5c/FC015tmNwcQPyaaZ5ZxTP9md0cQv6VwBPfuw+FWGFj8lu+apnxzM2OJHmX9yPIOLX6WfHM7oAggSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgS0Hub/px9HHBJfnJubZoUFOL84NzZHE4FhQg/NzeWZFNAIcDPzY2l1SwK6sweBvgJubF+QF0bhRF+QG6sG1DXRmGIn48b6wXUtVEY4+fjxvoBbS8DOT8eNyag8B4/HjfWO1UXUBjjx+POOjeLBBTG+PG4tfbXlQQUxvjxuLfm1z0FFMb48aDia0wwxs8HNV+khyF+PnjUZ/J+lRNG+AGh1Uv9hAF+QnDGDkF+YHDPCIL8wOBbSxDk5wUBhSA/LwgoBPl5QUAhyM8LAgpBfl4QUAjy84KvMUGQHxh8kR6C/MDgV98hyE8MD7/6DjF+ZACCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQAGCBBQgSEABggQUIEhAAYIEFCBIQHnL9Ofs44AzGPi8Y5oUlBsz7nnDf+FUUO7LsCcu7aeCckNGPXH/+vlcNpa4HYOeuHTiKaDckEFPXHri7iSeGzLmiRNQbs6YJ05AuTljnjgB5eaMeV5Y+ZZSdg/pIaDcjjHPutXveT4f9VVQ7smQZ9WL73lOhY8eG5zNiGdNdpGzs8K/ck7pt+rhHgx41qRFXC/o/58VUO7FgGfN64Dm1z8VlFsx3lkzENChdeAnGe+sEVBYYbyz5lUcy7vvAsqtGO9kiiK+CGj1/SUB5VaMd1JlEdcnl/Ot92T9TxwlfAnjnUQdzrUv0v89NC2/xqmf3IsBz6I131z5LaO0rX9zUeOJWzHgWTSvePZ/S3MksvDLjPhb6vRuwxeS8t+A10/uyZC/o96McTyg+V8hMrn6yT0Z9jfUvTE0HNC/Zk7pwv7HCd/OsL+f/leTRgP6zOZz5img3JRhfz/9TG4IaH7u7vIn92Tc389aQId+J7O4f/QQUO7KuL+flXnm2tfm05X+opndRoL7MfDvJ/8vaeb1GyjiNAf0IaDcnIF/L1nvGvkbCOJy2p4vw/0Y+LeSJbNxBXN1Rlld9xRQ7s7Av5P04mXr7wBZvQSa3Thavgaqn9yYkX8j2al742+hW70Jn8X1WdBpTumylkui3IeRfiP9M/VnQBvrLi9J8zjlkrUUlBsx0G+kP1EcCmgWzF4/iwX4acb5jZTfVyqfWf+CaHIBNJ+Npit1Xg6/yTi/kXhAs8udS0an1lZar4ffZJjfSDigSSrz0/fye6Wd18OPMsxvpPqVo+KJlYA+0kpODauvhx9lmN9Ikczqlk/3GuZaQJNNCSh3Y5jfSZHM3kyyuoueB7R1/i6g3JJhfitFKFsFzUI6v6z4Fv6yVnr6LqDcjWF+L50+Tvmz9ZdAH935ahbQqfmKI98QnMngpuxea43HSEDnLzktk1MF5acZ27w+857qgj5aAW3/hqeC8rMMbQYuXa4UNP8KVPbsi43C5RnajNz7aZ2+P/+RvLBTTQXlRxnZDKUuOzGvT9Trr+JP2fL+Rw1fwMhmdK64fGup0U8B5Y6MbLYH9NHOqIByN0b2nRX5e/HNzfx786377QLKzRjZN9aYQK4VdJ51PhrpXVZZNt56GH6JkX1fc/9aIW2u3/miZ77KsvXGo/BTDO3bys68q1P59gtaN+CrVcrN9y4JwOUZ2re1eulzU0GTPzSuBugnv8vYvpGpVD2erPpyA4/mLyilz+snv87gvo9W45bHs3P6lV/pnMrV2pNOA4s7MM5vI50ULrfT579CqQpot4T5qX7Wz2VHcAeG+l0kjZxPvP+eqK5u5rPJekvZVpNbRfXvI8FPM9TvIr3Hk93vaQR0KsLY2NK8nP4SUuMXkj7J1QM+zWC7i1ZAn39I+vlITvOTF1Zbmpe/J6Cuv/JxxtpdNAO69DLNZhGh+teN8lP9Za3NAd2zeCtzZjiIoXYX7YBmKexc+ewHdHozoHvOGdfmzHAQQ+0uVgP6fGo0oPPC9HgjoLvOGV/+GgDsz0i7i5WbSM/z9kdWxvyV6R+z8GUz1/Yruke055xRQDmBkXYXySXLrJ/PpSkP41pA84lqfd4/PAHt7iNAQDmBkXYbae3yRlbn7a8Cmr+iLOjoCbmAcnlG2n1MhfqZ7M/LH8rN5MvlZocvaAool2ek3chq5fIJ6MoNnjqg5faHD6e9HCOgnMBI48+cvvLSZrVevhwuV/SF7eNamTPDUQw1nupLmc355NkB7ZW9P2eGoxhqzMauYZZTvTcCGpkzrl1b2HgNAd5lrFF6laEiYfGLj5E541p19ZNPM9govJ7Ilaf66TM776rxkvDeYHeGILmRaWGWvXfu3myfMwoo38QQJBPI4Ufv3ggo38QQJBMJ1Cfv3ggo38QQJNML1GoiP3j3RkD5JoYgmU6gvuYrQgLKNzEEybQD9T1fUn/nlhXszRgk0wzoftVqzmOL2e36XPd7Wg4CSq4T0PYKga036jjlj766WvA1VxNAQMk1J5t7BbQ5e5ymrKDT36839Rupn3wNo5BcK3I7BbQT5yygeT8jO9NXPscwo9CI124BbSy3Ln2mJ/Pbd6KgfIxRRqkO0IEBTXZUnMX/f53W3hp9z66gzg+GDxQGGWS89pmAPpaALuvUu6ummFPh/QOFQQYZr3Uuh27fTL28OaDVFDP5XwXlw4wxBkRPjPOZ4R4BrVqe9fMxZf81p5fHteW9QM0QYkTs1kx5cr1LQIvldB5av3zPdwMVI4ghwX7++8dct/pKQFnYZKaa9vFRvfBRBvQx1zh9qHtc2QLEGEAcZe5nkreqXI2AzvPQgwLa6jiEGEAM2jwHbfat3Ep1lp+v07iH9GIHj4GAtpdhM+OHMXn7Rmra6FvjdXU1s35uDuh8EXTlDL69DJsZPwzJz77rmWTzJY8qoO0tJ+fv1WOtja7sYHpeQ+0fm4CyG+OHEfl1w7ymz6UyeFsD+mJzrQNZHphnnq/bLqDsxvhhRHnSXT7eytZwQNMtN/eYr17Ee0q6mR7K4HvprgavGT+MKAJaPtGYkh4V0LrVxQPr1xWq97K+LqwyfhixHtDGlPT56LSksxOrVkBb09n0zlKvoC/mntXx6yfvMYAY8SqgzTXnghYXOLubTiaR/Vlmc7abrjPwZjpbgI0MIEaEAlpODXubLieE9YvyqWlrVxvfzXBsYY0RxIhYQBspbG47qePyovyR/s4j9JN9GEKMyBM2HNDhjaeZraee/Rnu5n3BnoxAhuQn0dV3MdMVQxuvLM8IKF/LCGRMMUecH/z3P+l6724/LbSA8tWMQAalaevd43mrn+lu0p0KKF/LCCSinigWC1s3lDdz34C6ZcRRDCr2UHcw+Lr+KXwrtYceW/uIIGFYsItwP/OF6trAI/kyfhHCwb3FZ8etI4KUUcF5qmsAU8P8eL3Ctn2EzvjfzC8/zqDgPMm3Pqd8uVnQf3960c96a/n+Bg4qeeH2/L7PnPdCfEacJz8zT742XxU0X17dZLvAz/0NHFM65Tzhnn/n2PlKPiDOsyTiObf8t1xXZDRkaf6mfOHFK8sNPI9jbL/7GZpm8y18Phyu24Ip710ywUxfME3TaMiWndQlXX9la5Xx/e5nWv5NKOgF+Hg4yJzNYjaVTisbZ9vTEtBlQ+MBTff+fCjZ0sBRZ8unBDS/pfaBnRLm4+EY9YW8JI2rnq/Ot5RueWWn6YueD3UDmh9ftcqJAa2W+U4+HQ5RZPNvsTi1Xu1nksD3AprssjrGqqACyhY+HY6Qn4Anj+aPt/O5/qWl9XtI6a6Kpal4ZavxdUA//DUmAb0Wnw5HaJWssdyegM5LjbZWGXy929ZEM99QN6D5QQ2+97cI6LX4dNhdNZtMnyhX6nvM949aIe3seW1XvXWL1/WOcNO/gygBvRafDnvLk/MqoMlyFcrl8d40st51tdRLUOfy5vzCJOKf6+cj2dnz38FndkyIT4edzT/2S3+Sp+r53SOpRpLJbPExGpIsf8VD1aq95TrWH6xY/u9CP7+cj4d9TUvuxgLamHJmy49sjYHdN7bbXrO9/PLm/MGyIx96z5zHx0NMr07P08/nP5N1sglVK4+9mkYK+vLc+2UfTwro+BVfzufzIaT7Ez5fv3ssU9D5JflFyufLn+f7ZTmKP2QT2L2OPz3o5jtZWeFI+nkNPiAisioWzyyPl/PI4oXl7LKaes2PPtKrqjsd/8t53qkB5RqMCwLymWHxVLHKlM+m6nBmM85HOvmakmqW23n3+Nt3i1rvpFyGmXFBQJ694qlinf5r10JaPDT+TabBwy/20l6rvQwz44LtWoVbnmsvlxtobaZf0OV/9jiRr/fRP8j1N8LNGRhs1oxe8mS+VnsD3Q21C7qU9bFDztIMryQ5fStv7pEfZWCw2TOLefSSZ9Mnt5/DNyenWY/T8/nYG6gC2txa/z3A/xkZbLZE7jHPDIunyyCuPd0o6Ja8rh9nc41+QDvHGvrXxA0YGmw2Z6xYTp9fslP0J+1jM5Tdej43/Hhme9l99zDb/euewmsl2xgvbDZn7JF+yahaZVnOn8hnfL1cviprur3eUfZWKQKabW7zvw3uzHhhs7+rni8C2lxepq0rbRyqaXPr7SNoBLT6T4B214UVhgubNe67vBnQLd0sblr1A9pefr7o39aWf/RWhRWGC5tNWUH/Hmqs0lgOB3S57pnstdr6o9hRY3l+VRrRUwOa/YvkWnxqbJZNBaMBfWzraPXl0ebWH8WOGsvJe0i3Xj4+9m9iD62j4Cp8aGxWt6d5lbG1XH5raENAO80LBjR/H2sPHWzelYJekc+M7cqQ1T/7eeEGAvqqqulei7s+4YDWT88b/ljNsnfymV2yI58ZAa2+VWssqxaPJ68aq2e6l+KqZbd0awEtjrp1rJ8LaHuZa/CREfGqn/UstfPKbZ6xmzfa2fljdWpXHVhra/vXrPkvS0CvzUfGQXp5DYUzi2i+kd59nymZV756onGsu9es/e9DQK/NR8ZROmF7bw7a72fvy57dfpYXP/M1965Zp+cCem0+Mj7uGb5HIKbPDaQbe1QPJvupHl5J1oE1a2b72F3yAT4yPm5zNVdy2gvT2t7by+tPvau3aQG9Nh8Zn9co4atSdtYJBOjbAuprTFfmM+Ndy3Rw6ys2TDXTncz7mtJHdwnoYTXr7jV9M/vukg/wmfGmqcjY+PohKzfP3w7ogTXr73Xrvz++iQ+NYc0f9Lo5vR40U/hcc0NBi34uu34/oMfVbH3eq59X5VNjVDMuyZ+qrxj1Xl4UtPPsy4BO05SnczSga+fpR9XMzaLf5KNk0DSVU81/fyiW26s9/5jF85EUtBnKbkPn3S39fQyHqXeEh1rPNlfls2RMpwDlci8UyVTxOXFMp6Aj2VyezXaXbnf4rRw0z1zfabHAD/BZMqZTzTqgz+U8UclMsTWhbCyuFPWRb+uxRHn0vXy8n24W/SYfJmO2BbSqxVpAN8t298kwvbUn/fxBPk3GbApoPS0sA/rYHNNHdgX1uflHvY0j/x2IIBkjgTFbAjrVFya3B7T5XH7rfSnZR2ai0/JmZJT/MwZYkc3+0ofTNbJH03Wr5TSaRfR6FU2PYr5rVLUyn+seNKirfioohgB9ebnSx7N10oWVgK5OLVf6+agXWysc/jWh9I2mE21uzAiga8qT0SlUnrsktuk/B6OZrdbaxZT99SHtR48q6PJOivfGfRkB9BTJzHJarJfPBqsLoelaG9S7qKfC7Uf3+5eQvc/lf/ILE9yWAUBPfX+oLlvzZdlq3Rno8+HyVa2Cpo+0d39WQIf+lfCzfPD0VE0ajEW+WnLHvE5jtt5KQV/n8eyA+kG6J587PfEmVekrm5kHtNnOIqCvbhGdFtDqALkTHzs9bzSpDEsRw6Km3Xw2Ctor1UcCOl/ULfvpauhd+djpeadJxSTyRUB7r2jfcO/tMHqsw6bn5HOqA6qg9+RTp+etSd3q6fj6DHR+qnPDvbmfj5xN18eYPtc+Ln6aD5iePSZ1eRermm4I6Kvtf+SOeH2IyVOd4+KX+Xzpen9S93xhmbjs1nuyuDw3DQW0yO2HklW9jX8P9o6LH+bjpe/deVRVx2S52EHP2PY/fAmydYzF5YZTjouP8/GyYrif7e4N3m0PF/QDt95X954eY+9YFPSn+XQZ14raWveKO0fLc81XdB5bPZ728uY3ETFvZUq+2PTGcXFFPl2GtaaF2WNJOctZWauU5ROtCu8e0NabiHj+P4JH9sWm+HFxST5dRs2RmLKZ5XwHJ78ltPxzXrMVyOfd9pXAtg+lLnn4TYSU315Ntyegt+HTZVBWuOKhx9807PHIClrfWElrMyUNKgP6mIr1e4eSPDb4Jra9YGVLxaF0Ni2gP82ny6A8cfkjzz+9CmjSzqnRoGKa2vnCUHsWORrQ9vJ2+Q2y/GgE9DZ8ugxKs7XMDpdnmgHN7iI9T9fni6VFQZ9XE+dIT+mu6gMJzCf3D+jy/08ebxwXF+XjZUwZw6Qc3YAW0Z1XSP/vb+W5qFk08/noI930o9z+4LtoL2+XvtH8TUeOi4vy8TKmmgMu5WicljdOz5cVpkZAH8mT7YB2rjA2TvFX30V7ebvVgG4+Li7K58uYWEAfaUeyquQrt+4ilQld9p4d1aZO7RnQ+by9de1TP+/BB8yYoYBOZT+rbSQ1LW/EpP1M/vex7KLe9tZC7RfQx7S8+dbNI27BJ86YKmHzefdyOTTtXXsb5Zl5uvW2ZYVs743lwXcRfWlrWytzY27BJ86YbHr5DGhy/6jdvXIbvYB2C5o8n26ltTz6NqoNRjXexLub5GJ84owpLlOmp++j/UznbK0VV6L5aD8cKNarYwxs742j4eJ85IxJqzeftz+y6r2OUtbO9PZLf+1q8d1Z5L793HdOy9X4yBlUhSIt6POZgY1k89TBghbFK2eRezdxm73ntFyIz5xRVSjqcgxNQZcJ60hAm3lq9/Psgp6zd87kQ2dYFYrGAy9elH/7MxzQcq1iAT7EiONN6zfFi/5tD+i8tLJSf/dwKCOON60GtChgNqFMAtqbZI5NQFf2D4cy4HjTWsCK2eFUqL8LVW/85QVGAeU8BhxvWg9oulzMP9N+FivUr4rtH45lwPGmtWuQZQrzfyzn9c/nX883W/tvL8PxDDjetXKnpwho9xeXpu5fvTSy+/YyHM+A421rlzCztcpfCG1ltPrW/Ou9t5fheAYc7+tOG1sBfT6RXAhd/ua65zfsN5Rw7RICHMuI40ArAV2aOyXTzuXLTtlWVk/rVy4hwLGMOPaXXthMH6sDWt46agW0vEJQ9TRy5RT2YMixu+yaZlq9xgy0G9D88b/XFFsvd/jJNwkPAWV/WfGKmFYRLFd5dPu51LXYDZzGGGRnU37anlRwLmjRx7Sizbgu23PLiK9iDLKz6sbRslBOLNNv1rf6+Xwq2fTql5bKKSsczFhjZ/m1yfzROqDlef4jX8yj+SKg2XT3gPelzpQMB3bWDmj1W53ZuXt14bO4GrpsYyWgxXR3xzdUzpzhj9HAzgYD2ruR1Axo+vX75p4ejenubu9HQekxGNjZaEBb0Vzq+Vxhvk76t421gPaeefPtVFdvd9s2l2cwsLPhgJZz0OU1SzezaKVfJC03eVRAs9Qnxw7/MRbYWedUuhHQ+Rpo+nQzoPPtppUT9W0BHZ1N5lPl4v1xe8YCe0suWb4I6COP4/yi8uS+PNevt17t4PUxjhW0vFg7snHuw1hgd3XsGjd8pmLV9LlXBW22b0tAuxVuv5dlIjqycW7EWGB/c+FWpovdGPZq+aKfWwLaDXv7rTxXS5fhP8YCB2hUr7NGYwr4YsrZesnf48viq8NrL3feyUNA6TAW2F9j3thfae3lzSnny4J2nk/XfHEE+bE8Nzk9/7m+dW7EWGB3WclGKtXYQPqicgu9rfUntdWKw6svAU3+P8KGt8JvMxbYW3YuPRy1dPVlOX28tYP+69f3s2xloKDFG/Ezw8xgYG+tfg6d+GaJSmevowF9sd3sCJ9/nl78B5im2qad89MMBvaWXaxMvjD/+nXpNcznP94PaL2F5xeTyuX1V+snFaOBvTVOvF9Vall9jtSSqjcDukS8FfSV++pFM/WTmuHA3pK53ZQtv3pZXdD21G9TxYr8FRc+p35A6/2LJyVDgr1tCGgZteXRfAKY9WvrBHR5zXJEZU+bh5Yfo35SMybY23hAszSVU8x8Nhq+D57fcW9+B7S11fxo9JM2g4K9TXOj0vtJjYDmc8r0+fQ2+WOJYKRk6Tl6tfzce73d8migxdBgd+nEbn6ozlBRyCpZ5Tl7bCbYD2h2wSA/HgFljKHB/uqz7Vb3ikbVydrl4mMvoI3MCyhbGRocYA5fYzKarJQtl9dA0828dSiPdkAbfU72JKCMMDQ4zLR+76cO6Mp09a2DmGe0+W6rwxJQNjI0OM5UKp7NllfWfPcgyjv6K0fx4mHIGBocp+hh0cW1gB5zFAPz4ORFrTUgY2xwmKpa7YBWbds5oOmp+nBAq+8AQIOxwVGm9F7686H8+Z79j6S77e65+mFHww8xODhIMu3sTkHza5OHFSvffPswq6Pb5TsA/Dijg4Ok0WwGtJwWHpeq1TtCztWJM2Q4yKuATumNo+rZnaJKmnkAAAokSURBVA+lvTwfiLkmMcYMB3kd0PY/DzmU9vJypPpJiEHDQbYF9NCG+VInBzGaOMgSzeQ3OrPn038eWlAB5SBGEwdJLm3O/ewEdEoyetCh5HuFfRhOHGTKC1rVcQlochv+sCmoO+0cwXDiKFOlePpvpWdAl38ceSyHbJ67Mp44zHq10vP25Tz+uPtI+sn+DCiOs16trKDJafwOO5JLPsMQ4zStE/xQ9MqprhN2PsQI4zyNzkWaV94iit4yUl22Mlg4XfELnlsjlp26N/48uhHzVjYzVjhd4+LlloiVE9jIhDatp4IyzFDhfI2LlxsitkNAi6uxfioYZKjwBep4bajY+wEt+6mgDDJS+AZ1uj4c0PkXpwSUDYwUvkdarvGKNQO6aS5ZXAEVUEYZKXyP/QK67WS8PoX3c8EQA4XvEQ1o9TWm50ODKVyiKaBsYqDwPWIBbX2RvviL9F5vYEpeK6CMMlA43HCUggFd/VXOkc2kLxZQNjBQONr4hcXsZHzbd+mzHaQ73BDQ6WEGyjYGCgcrT7BH131jaG79ItNUi++cOzFQOFY2qxxZe4eGvR/Q+L65FSOFY22M2S4N2x7Q5l+tB68YKRwrOhs8Y5/6yUaGCsfqx+y4Wo1cNkj3rp8EGSscq/t7QUf2at5od+vp3vOQ7n80/C7DhWPl1xfTx7f/vUtb9trcY5rKdK1Da84PM144VlKlNE8jZ9lv77bZz785Z/2IgLKZ8cKxkijlAX00l488jmUhzWWWTQFlE+OFg6XlapfqE9XKd928AvqpQ+GHGC8cLL0CemZA8yOa7249suMSUDYxXjhYPttbHk3X+MRRNI7oORsVUIKMFw7WTuVXBHQ+gRdQYowXDtae+50Y0CKd6c13/WQbA4aDted+n75xk/9Fefmd+PlgfIuJjQwYDpalMr0hH/wifdnf0Velry9KXkcdhhgxHK2Vyni14i9LNtD6G+z0k+0MGQ7XClR1+XF8W8VC4IX5r+crJ2FGDsdrBzS4pegWyrP2Y/86E+7B0OFjdglofBPFNU8B5X2GDh9zckCTl+XpVFCijBw+5lsCmhR0eQQCjBw+5tiA9k7Hq8fTgs5rhI6G2zNw+Jg37gAlr8vuA2Ubbxa08Xj5kIASZeDwOVmyQvdvslvpU/5EsbDyeNlPv8JJkIHDB00NmzcwL+WPL4sDjxdlFVBiDBw+qQrnxoL2A7pt+ZGfyAsoMQYOJwhfDe1NXseWs9elfxJQYgwcTjB//3LrSXzvJtK2gJbf/tRPgowcTvA37dte0O3RTJfzs//oZQSYGTmc4O+bmH/LG/r1RkDrGWfwRhbMDB1OMD3/U0RbA7ZPQMuCjh84ZIwdTvDvCubQd5nKm/bZRtK1Wg/3HtdM9mEgcYJp/huRHo88oGVR61vnyTayLW74Ir2AshMDiRNkN8PTnpVz0mqhe+enN5ttTnMFlH0YSJwh/zJRt5eNCefULOKjnruWjwso+zOQOEWWtWR6uTz0eOShe1nQl3tsL0OcgcQ5pjWt+/P1oysFbRS2MZuFNxlJnCPLZF7G9hyzfrQ/D+1tcNk17MFI4iTJ+fv0dyE0LVx2bv9cP33dyvfgi1R2Og1vM5Q4SdqzPKDzQ2VA//53ea5aKVvzkf/KU+B7+7DOWOIkWT+f36yfn5nb2LgNP/8mU+NWU/nnqbUJ2IkRxVme59fVVzWbAZ2qgD6SX8ksNpztxN13DmNAcZb60mR2cfO5zrLyc0lA+RYGFGcpyvk8lc8C2rz3LqB8CwOKs8wXMLOAFjd6ssA+H3kGNG1qteHl9e1n4H0GFGdJAppmNL9Rni3VE9ZypeqPAsqRDCjOkp6vz19Hyr53lBWvd8X00QhoXt30mUPeCbdlQHGa4opnI43F9HFqrlRnMXt9O8ewByOK87QmldmJfPWNztYEdKq7mK2ytiK8xYjiRHUPk6+C5v1Mr4GWMe1vuNjL4W+ImzGkOM8czZXT8WTl3ox1ZD/6yRGMKU6TzRCfD62sXdyFN3Y5nUHIafIve/4trK2dXs0UUL6AQchp0tvjr8+yi/tGAsoXMAg5TeNLnqtrCyjfxiDkNNu+4p7dVn8IKN/AIOQ0G39HaC6oe0h8C6OQ02z9Jcv0SqmA8g2MQk4zpXeRxtbf8u1POJxhyHnSm0JDqz8ElK9iGHKibb9UNKUF/dARwhrjkNNU+RwpaL4ApzIOOUujngMFNQHlixiInGT5UmdW0Jcv0k++h5HIOVr9HCgofBPDlXPk/Zy/Ji+gXInhyjmSvwp0+vv9ooezcy7GcOUc9Zc6Xd7kcgxXzlF/e0lAuRzDlXOkVz4FlIsyXDnH88JnGdCTDwu2MF45Rx7Q7D8QD1dhvHKO/BQ+uxgKV2HAco4qnfrJ9RixnKP5n3k/+6BgG0OWc+T/fTj95JKMWc6R/0fh1ZNLMmw5R5JM8eSqDF1OMiUn8eceCUQZupzFtU8uz9jlNPrJ1Rm8AEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChAkoABBAgoQJKAAQQIKECSgAEECChD0P8jbYHT6JruTAAAAAElFTkSuQmCC" width="672" /></p>
+<p><img src="data:image/png;base64,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IAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUIElCAIAEFCBJQgCABBQgSUIAgAQUI+h+Sx1pRaYf1KQAAAABJRU5ErkJggg==" width="672" /></p>
 </div>
 <div id="join-points-to-tracts-to-assign-outreach-activities-to-tracts" class="section level4">
 <h4>Join points to tracts to assign outreach activities to tracts</h4>
@@ -522,14 +530,14 @@ plot(outreach_pnt_sp$geometry)</code></pre>
 tractsp_prj &lt;- st_transform(tractsp, 3310)
 pnt_prj &lt;- st_transform(outreach_pnt_sp, 3310)
 
-# sspatial join points to tracts
+# spatial join points to tracts
 pnt_tract &lt;- st_join(tractsp_prj, pnt_prj)
 
 
 # Verify tracts have been duplicated where there are multiple points
 # review
 subset(pnt_tract, GEOID==&quot;06037482503&quot;)</code></pre>
-<pre><code>## Simple feature collection with 6 features and 40 fields
+<pre><code>## Simple feature collection with 6 features and 41 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
 ## bbox:           xmin: 175426.9 ymin: -438414 xmax: 176276 ymax: -437442.4
@@ -626,13 +634,13 @@ subset(pnt_tract, GEOID==&quot;06037482503&quot;)</code></pre>
 ## 1037.3 2730 North Del Mar Avenue, Rosemead, CA 91770 SELF SERVICE PORTAL
 ## 1037.4 2730 North Del Mar Avenue, Rosemead, CA 91770 SELF SERVICE PORTAL
 ## 1037.5 2730 North Del Mar Avenue, Rosemead, CA 91770 SELF SERVICE PORTAL
-##        start_activity_date impressions month
-## 1037             1/10/2020          53     1
-## 1037.1           1/17/2020          15     1
-## 1037.2            2/1/2020          21     2
-## 1037.3           1/23/2020          19     1
-## 1037.4           1/23/2020          19     1
-## 1037.5           2/11/2020          18     2
+##        start_activity_date impressions month          activity
+## 1037             1/10/2020          53     1           meeting
+## 1037.1           1/17/2020          15     1           meeting
+## 1037.2            2/1/2020          21     2           meeting
+## 1037.3           1/23/2020          19     1           meeting
+## 1037.4           1/23/2020          19     1 training_delivery
+## 1037.5           2/11/2020          18     2 training_delivery
 ##                              geometry
 ## 1037   MULTIPOLYGON (((175426.9 -4...
 ## 1037.1 MULTIPOLYGON (((175426.9 -4...
@@ -646,6 +654,13 @@ subset(pnt_tract, GEOID==&quot;06037482503&quot;)</code></pre>
 <h3>Summarize outreach data</h3>
 <div id="summarize-polygons" class="section level4">
 <h4>Summarize Polygons</h4>
+<ul>
+<li>keep only 2020 outreach events.<br />
+</li>
+<li>Version 1: group by month, activity type and tract<br />
+</li>
+<li>Version 2: group by month and tract</li>
+</ul>
 <pre class="r"><code># summarize activities by tract by month
 out_act_month_sum &lt;- 
   outreach_poly %&gt;% 
@@ -654,24 +669,25 @@ out_act_month_sum &lt;-
   filter(start_activity_date %like% &quot;/2020&quot;) %&gt;% 
 
   # group by tract, activity type and activity date
-  group_by(level, tract, `Activity Type`, month) %&gt;% 
+  group_by(level, tract,`Activity Type`, activity, month) %&gt;% 
 
   # get a count of activities &amp; total number of impressions
   summarize(count = length(tract),
             sum_impressions = sum(impressions, na.rm = T))
 
 head(out_act_month_sum)</code></pre>
-<pre><code>## # A tibble: 6 x 6
-## # Groups:   level, tract, Activity Type [3]
-##   level  tract `Activity Type`     month count sum_impressions
-##   &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;               &lt;chr&gt; &lt;int&gt;           &lt;dbl&gt;
-## 1 county 0     activity_type_other 2         1            6666
-## 2 county 0     activity_type_other 3         8            6740
-## 3 county 0     activity_type_other 4         6           35161
-## 4 county 0     advertising         3         1         5046000
-## 5 county 0     advertising         4         2         2160000
-## 6 county 0     flyers              3         1            4500</code></pre>
+<pre><code>## # A tibble: 6 x 7
+## # Groups:   level, tract, Activity Type, activity [6]
+##   level  tract `Activity Type` activity         month count sum_impressions
+##   &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;           &lt;chr&gt;            &lt;chr&gt; &lt;int&gt;           &lt;dbl&gt;
+## 1 county 0     activity_type_~ Community Educa~ 5         1              10
+## 2 county 0     activity_type_~ Facebook post    3         4            1742
+## 3 county 0     activity_type_~ Launched biling~ 5         1             500
+## 4 county 0     activity_type_~ podcast          4         1             900
+## 5 county 0     activity_type_~ radio interview  4         1           10000
+## 6 county 0     activity_type_~ Social Media Ho~ 5         1             267</code></pre>
 <pre class="r"><code># table(out_act_month_sum$`Activity Type`, out_act_month_sum$month, useNA = &quot;always&quot;)
+#table(out_act_month_sum$activity)
 
 
 # summarize outreac by tract by month, regardless of activity type
@@ -688,13 +704,17 @@ out_month_sum &lt;-
   summarize(count = length(tract),
             sum_impressions = sum(impressions, na.rm = T))
 
-table(out_month_sum$month, useNA = &quot;always&quot;)</code></pre>
-<pre><code>## 
-##    1    2    3    4    5 &lt;NA&gt; 
-##  116  111  505  808  639    0</code></pre>
+#table(out_month_sum$month, useNA = &quot;always&quot;)</code></pre>
 </div>
 <div id="summarize-points" class="section level4">
 <h4>Summarize Points</h4>
+<ul>
+<li>keep only 2020 outreach events.<br />
+</li>
+<li>Version 1: group by month, activity type and tract<br />
+</li>
+<li>Version 2: group by month and tract</li>
+</ul>
 <pre class="r"><code>pnt_act_month_sum &lt;- 
   pnt_tract %&gt;% 
   as.data.frame() %&gt;%   # convert to data frame for simplicity
@@ -703,23 +723,23 @@ table(out_month_sum$month, useNA = &quot;always&quot;)</code></pre>
   filter(start_activity_date %like% &quot;/2020&quot;) %&gt;% 
 
   # group by tract, activity type and activity date
-  group_by(GEOID, `Activity Type`, month) %&gt;% 
+  group_by(GEOID, `Activity Type`,activity, month) %&gt;% 
 
   # get a count of activities &amp; total number of impressions
   summarize(count = length(GEOID),
             sum_impressions = sum(impressions, na.rm = T))
 
 head(pnt_act_month_sum)  </code></pre>
-<pre><code>## # A tibble: 6 x 5
-## # Groups:   GEOID, Activity Type [6]
-##   GEOID       `Activity Type`   month count sum_impressions
-##   &lt;chr&gt;       &lt;chr&gt;             &lt;chr&gt; &lt;int&gt;           &lt;dbl&gt;
-## 1 06037104320 event             4         1             225
-## 2 06037104620 training_delivery 2         2              75
-## 3 06037106646 booths            1         1              30
-## 4 06037113322 convening         2         1              12
-## 5 06037119002 training_delivery 2         1              30
-## 6 06037119700 event             4         1             150</code></pre>
+<pre><code>## # A tibble: 6 x 6
+## # Groups:   GEOID, Activity Type, activity [5]
+##   GEOID       `Activity Type`   activity        month count sum_impressions
+##   &lt;chr&gt;       &lt;chr&gt;             &lt;chr&gt;           &lt;chr&gt; &lt;int&gt;           &lt;dbl&gt;
+## 1 06037104320 event             event           4         1             225
+## 2 06037104320 event             event           5         1             100
+## 3 06037104620 training_delivery training_deliv~ 2         2              75
+## 4 06037106646 booths            booths          1         1              30
+## 5 06037113322 convening         convening       2         1              12
+## 6 06037119002 training_delivery training_deliv~ 2         1              30</code></pre>
 <pre class="r"><code>## summarize by month only--regardless of activity type
 pnt_month_sum &lt;- 
   pnt_tract %&gt;% 
@@ -754,7 +774,7 @@ out_act_month_sum %&gt;%
   ungroup %&gt;% select(-level)) %&gt;% 
   
   # summarize by geoid, activity type and month to get total counta nd impressions
-  group_by(GEOID, `Activity Type`, month) %&gt;% 
+  group_by(GEOID, `Activity Type`, activity,  month) %&gt;% 
   summarize(count_act = sum(count, na.rm = T),
             sum_impressions = sum(sum_impressions, na.rm = T))
 
@@ -777,17 +797,29 @@ out_month_sum %&gt;%
   summarize(count_act = sum(count, na.rm = T),
             sum_impressions = sum(sum_impressions, na.rm = T))</code></pre>
 </div>
+<div id="recode-activity-data-where-necessary" class="section level3">
+<h3>Recode activity data where necessary</h3>
+<ul>
+<li>for some of the longer activity type names, recode to group with other relevant categories</li>
+</ul>
+<pre class="r"><code>act_month_sum$activity[act_month_sum$activity == &quot;COFEM Van wrapped in census ads drove through the neighborhoods of HP The van was equipped with a loudspeaker that had a minute long announcement from El terrible from La Raza radio station, a trusted source &quot;] &lt;- &quot;Van with census ads and loudspeakers&quot;
+
+act_month_sum$activity[act_month_sum$activity == &quot;Van outfitted with loudspeakers canvassed through HP&quot;] &lt;- &quot;Van with census ads and loudspeakers&quot;
+
+# table(act_month_sum$activity, useNA = &quot;always&quot;)</code></pre>
+</div>
 <div id="where-are-the-gaps-in-outreach" class="section level3">
 <h3>1. Where are the gaps in outreach?</h3>
 </div>
-<div id="for-htc-tracts-in-may" class="section level3">
-<h3>For HTC Tracts in May:</h3>
+<div id="for-htc-tracts-in-may-june" class="section level3">
+<h3>For HTC Tracts in May-June:</h3>
 <ol style="list-style-type: decimal">
-<li>Filter the activity and outreach data by HTC tract (57+) and month (May = 5)<br />
+<li>Filter the months (May = 5, June = 6)<br />
 </li>
+<li>Sum activities and impressions across months.</li>
 <li>Join to the tract-regional crosswalk to get the region name and HTC score<br />
 </li>
-<li>If impressions are NA, that means that tract had no outreach data. Make zero.</li>
+<li>If impressions are NA, that means that tract had no outreach data in may/june. Make zero.</li>
 <li>For the sum total of outreach data (no activity info) classify the number of impressions by quartile.</li>
 <li>Export to csv<br />
 </li>
@@ -797,19 +829,31 @@ out_month_sum %&gt;%
 <pre class="r"><code># join htc data to outreach activity data. filter only tracts with HTC of 57+ 
 act_tracts_outreach_htc &lt;- 
 act_month_sum %&gt;% 
-  filter(month==&quot;5&quot;) %&gt;% 
-  full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
-  filter(!is.na(GEOID) &amp; htc &gt;= 57) %&gt;% 
-  rename(&quot;activity&quot;=`Activity Type`)
+  rename(&quot;activity_type&quot;=`Activity Type`) %&gt;% 
+  filter(month %in% c(&quot;5&quot;, &quot;6&quot;)) %&gt;% 
   
+  # sum for may and june
+  group_by(GEOID, activity_type, activity ) %&gt;% 
+  
+  summarize(count_act = sum(count_act, na.rm=T),
+            sum_impressions = sum(sum_impressions, na.rm = T)) %&gt;% 
 
+ # join regions to tracts
+  full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
+  
+  # keep only HTC tracts 
+  filter(!is.na(GEOID) &amp; htc &gt;= 57) %&gt;%
+  
+  mutate(sum_impressions = ifelse(is.na(sum_impressions), 0, sum_impressions),
+         count_act = ifelse(is.na(count_act), 0, count_act))
+  
 
 
 # join htc data to outreach data. filter only tracts with HTC of 57+ 
 tracts_outreach_htc &lt;- 
 out_all_month_sum %&gt;% 
-  filter(month==&quot;5&quot;) %&gt;%
-  mutate(activity = &quot;all&quot;) %&gt;% 
+  filter(month %in% c(&quot;5&quot;, &quot;6&quot;)) %&gt;% 
+  mutate(activity_type = &quot;all&quot;) %&gt;% 
   full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
   filter(!is.na(GEOID) &amp; htc &gt;= 57) %&gt;% 
   
@@ -821,29 +865,29 @@ out_all_month_sum %&gt;%
 
 
 # export outreach data 
-write.csv(tracts_outreach_htc, paste0(root, &quot;outreach/tracts_all_outreach_htc_0528.csv&quot;), row.names = FALSE)
+write.csv(tracts_outreach_htc, paste0(root, &quot;outreach/tracts_all_outreach_htc_0604.csv&quot;), row.names = FALSE)
 
 # export outreach data by activity type
-write.csv(act_tracts_outreach_htc, paste0(root, &quot;outreach/tracts_activity_outreach_htc_0528.csv&quot;), row.names = FALSE)
+write.csv(act_tracts_outreach_htc, paste0(root, &quot;outreach/tracts_activity_outreach_htc_0604.csv&quot;), row.names = FALSE)
 
 # join to spatial tract data and export
 tracts_outreach_htc_sp &lt;- left_join(tractsp, tracts_outreach_htc, by=&quot;GEOID&quot;)
 act_tracts_outreach_htc_sp &lt;- left_join(tractsp, act_tracts_outreach_htc, by=&quot;GEOID&quot;)
 
 # export spatial data
-st_write(tracts_outreach_htc_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_htc_tracts_05-28.geojson&quot;),  delete_dsn = TRUE)</code></pre>
-<pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_htc_tracts_05-28.geojson&#39; using driver `GeoJSON&#39;
-## Writing layer `outreach_htc_tracts_05-28&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_htc_tracts_05-28.geojson&#39; using driver `GeoJSON&#39;
-## Writing 2344 features with 17 fields and geometry type Multi Polygon.</code></pre>
-<pre class="r"><code>st_write(act_tracts_outreach_htc_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_activity_htc_tracts_05-28.geojson&quot;),  delete_dsn = TRUE)</code></pre>
-<pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_htc_tracts_05-28.geojson&#39; using driver `GeoJSON&#39;
-## Writing layer `outreach_activity_htc_tracts_05-28&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_htc_tracts_05-28.geojson&#39; using driver `GeoJSON&#39;
-## Writing 2436 features with 16 fields and geometry type Multi Polygon.</code></pre>
+st_write(tracts_outreach_htc_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_htc_tracts_0604.geojson&quot;),  delete_dsn = TRUE)</code></pre>
+<pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_htc_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `outreach_htc_tracts_0604&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_htc_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
+## Writing 2367 features with 17 fields and geometry type Multi Polygon.</code></pre>
+<pre class="r"><code>st_write(act_tracts_outreach_htc_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_activity_htc_tracts_0604.geojson&quot;),  delete_dsn = TRUE)</code></pre>
+<pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_htc_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `outreach_activity_htc_tracts_0604&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_htc_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
+## Writing 2541 features with 16 fields and geometry type Multi Polygon.</code></pre>
 </div>
-<div id="for-all-tracts-in-may" class="section level3">
-<h3>For All Tracts in May:</h3>
+<div id="for-all-tracts-in-may-june" class="section level3">
+<h3>For All Tracts in May-June:</h3>
 <ol style="list-style-type: decimal">
-<li>Filter the activity and outreach data by month (May = 5)<br />
+<li>Filter the activity and outreach data by month (May = 5, June =6)<br />
 </li>
 <li>Join to the tract-regional crosswalk to get the region name and HTC score<br />
 </li>
@@ -859,17 +903,31 @@ st_write(tracts_outreach_htc_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;
 # join htc data to outreach activity data. 
 act_tracts_outreach &lt;- 
 act_month_sum %&gt;% 
-  filter(month==&quot;5&quot;) %&gt;% 
-  full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
-  filter(!is.na(GEOID) &amp; !is.na(regn_nm) ) %&gt;% 
-  rename(&quot;activity&quot;=`Activity Type`)
+  rename(&quot;activity_type&quot;=`Activity Type`) %&gt;% 
+  filter(month %in% c(&quot;5&quot;, &quot;6&quot;)) %&gt;% 
   
+  # sum for may and june
+  group_by(GEOID, activity_type, activity ) %&gt;% 
+  
+  summarize(count_act = sum(count_act, na.rm=T),
+            sum_impressions = sum(sum_impressions, na.rm = T)) %&gt;% 
+
+ # join regions to tracts
+  full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
+  
+  # keep only HTC tracts 
+  filter(!is.na(GEOID) &amp; !is.na(regn_nm)) %&gt;%
+  
+  mutate(sum_impressions = ifelse(is.na(sum_impressions), 0, sum_impressions),
+         count_act = ifelse(is.na(count_act), 0, count_act))
+
+
 
 # join htc data to outreach data.
 tracts_outreach &lt;- 
 out_all_month_sum %&gt;% 
-  filter(month==&quot;5&quot;) %&gt;%
-  mutate(activity = &quot;all&quot;) %&gt;% 
+  filter(month %in% c(&quot;5&quot;, &quot;6&quot;)) %&gt;% 
+  mutate(activity_type = &quot;all&quot;) %&gt;% 
   full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
   filter(!is.na(GEOID) &amp; !is.na(regn_nm)) %&gt;% 
   
@@ -881,10 +939,10 @@ out_all_month_sum %&gt;%
 
 
 # export outreach data 
-write.csv(tracts_outreach, paste0(root, &quot;outreach/tracts_all_outreach_0528.csv&quot;), row.names = FALSE)
+write.csv(tracts_outreach, paste0(root, &quot;outreach/tracts_all_outreach_0604.csv&quot;), row.names = FALSE)
 
 # export outreach data by activity type
-write.csv(act_tracts_outreach, paste0(root, &quot;outreach/tracts_activity_outreach_0528.csv&quot;), row.names = FALSE)
+write.csv(act_tracts_outreach, paste0(root, &quot;outreach/tracts_all_activity_outreach_0604.csv&quot;), row.names = FALSE)
 
 
 # join to spatial tract data and export
@@ -892,14 +950,14 @@ tracts_outreach_sp &lt;- left_join(tractsp, tracts_outreach, by=&quot;GEOID&quot
 act_tracts_outreach_sp &lt;- left_join(tractsp, act_tracts_outreach, by=&quot;GEOID&quot;)
 
 # export spatial data
-st_write(tracts_outreach_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_tracts_05-28.geojson&quot;),  delete_dsn = TRUE)</code></pre>
-<pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_tracts_05-28.geojson&#39; using driver `GeoJSON&#39;
-## Writing layer `outreach_tracts_05-28&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_tracts_05-28.geojson&#39; using driver `GeoJSON&#39;
-## Writing 2344 features with 17 fields and geometry type Multi Polygon.</code></pre>
-<pre class="r"><code>st_write(act_tracts_outreach_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_activity_tracts_05-28.geojson&quot;),  delete_dsn = TRUE)</code></pre>
-<pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_tracts_05-28.geojson&#39; using driver `GeoJSON&#39;
-## Writing layer `outreach_activity_tracts_05-28&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_tracts_05-28.geojson&#39; using driver `GeoJSON&#39;
-## Writing 2449 features with 16 fields and geometry type Multi Polygon.</code></pre>
+st_write(tracts_outreach_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_tracts_0604.geojson&quot;),  delete_dsn = TRUE)</code></pre>
+<pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `outreach_tracts_0604&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
+## Writing 2371 features with 17 fields and geometry type Multi Polygon.</code></pre>
+<pre class="r"><code>st_write(act_tracts_outreach_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_activity_tracts_0604.geojson&quot;),  delete_dsn = TRUE)</code></pre>
+<pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `outreach_activity_tracts_0604&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
+## Writing 2572 features with 16 fields and geometry type Multi Polygon.</code></pre>
 </div>
 
 
