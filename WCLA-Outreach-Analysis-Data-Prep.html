@@ -364,7 +364,7 @@ summary {
 
 <h1 class="title toc-ignore">WCLA Outreach Analysis - Data Prep</h1>
 <h4 class="author">LD</h4>
-<h4 class="date">6/04/2020</h4>
+<h4 class="date">6/03/2020</h4>
 
 </div>
 
@@ -382,6 +382,7 @@ root &lt;- &quot;W:/Project/RDA Team/Census2020/data/&quot;
 
 cb_root &lt;- &quot;W:/Base/CBF/census_2018_cartographic_boundary_files/&quot;
 
+
 # load spatial  tract data 
 tractsp &lt;- st_read(paste0(cb_root, &quot;cb_2018_06_tract_500k/cb_2018_06_tract_500k.shp&quot;), stringsAsFactors = FALSE)</code></pre>
 <pre><code>## Reading layer `cb_2018_06_tract_500k&#39; from data source `W:\Base\CBF\census_2018_cartographic_boundary_files\cb_2018_06_tract_500k\cb_2018_06_tract_500k.shp&#39; using driver `ESRI Shapefile&#39;
@@ -393,6 +394,10 @@ tractsp &lt;- st_read(paste0(cb_root, &quot;cb_2018_06_tract_500k/cb_2018_06_tra
 ## proj4string:    +proj=longlat +datum=NAD83 +no_defs</code></pre>
 <pre class="r"><code># limit to LA County
 tractsp &lt;- tractsp[tractsp$COUNTYFP ==&quot;037&quot;,]
+
+# group quarters
+gq_tract &lt;- fread(paste0(root, &quot;group_quarters_population.csv&quot;), stringsAsFactors =  FALSE, data.table = FALSE,
+                  colClasses = c(&quot;GEOID&quot;=&quot;character&quot;, &quot;NAME&quot;=&quot;character&quot;))
 
 
 # read in state dbf of htc data
@@ -650,9 +655,102 @@ subset(pnt_tract, GEOID==&quot;06037482503&quot;)</code></pre>
 ## 1037.5 MULTIPOLYGON (((175426.9 -4...</code></pre>
 </div>
 </div>
-<div id="summarize-outreach-data" class="section level3">
-<h3>Summarize outreach data</h3>
+<div id="summarize-outreach-data" class="section level2">
+<h2>Summarize outreach data</h2>
+<div id="summarize-by-reporting-organization-and-tract" class="section level3">
+<h3>Summarize by Reporting Organization and Tract</h3>
 <div id="summarize-polygons" class="section level4">
+<h4>Summarize Polygons</h4>
+<ul>
+<li>keep only 2020 outreach events.<br />
+</li>
+<li>group by month, reporting organization and tract</li>
+</ul>
+<pre class="r"><code># summarize activities by tract by month
+out_org_month_sum &lt;- 
+  outreach_poly %&gt;% 
+  
+  # keep only recent outreach events (in 2020 only)
+  filter(start_activity_date %like% &quot;/2020&quot;) %&gt;% 
+
+  # group by tract, activity type and activity date
+  group_by(level, tract,`Reporting Organization Name`, month) %&gt;% 
+
+  # get a count of activities &amp; total number of impressions
+  summarize(count = length(tract),
+            sum_impressions = sum(impressions, na.rm = T))
+
+head(out_org_month_sum)</code></pre>
+<pre><code>## # A tibble: 6 x 6
+## # Groups:   level, tract, Reporting Organization Name [4]
+##   level  tract `Reporting Organization Name`    month count sum_impressions
+##   &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;                            &lt;chr&gt; &lt;int&gt;           &lt;dbl&gt;
+## 1 county 0     CAIRLA                           4         3            4500
+## 2 county 0     California Black Women&#39;s Health~ 4         1             228
+## 3 county 0     Child Care Resource Center Inc   4         8           22024
+## 4 county 0     Child Care Resource Center Inc   5       120         3447733
+## 5 county 0     Consejo de Federaciones Mexican~ 3         2           44289
+## 6 county 0     Consejo de Federaciones Mexican~ 4        86         9508324</code></pre>
+</div>
+<div id="summarize-points" class="section level4">
+<h4>Summarize Points</h4>
+<ul>
+<li>keep only 2020 outreach events.<br />
+</li>
+<li>group by month, reporting organization and tract</li>
+</ul>
+<pre class="r"><code>pnt_org_month_sum &lt;- 
+  pnt_tract %&gt;% 
+  as.data.frame() %&gt;%   # convert to data frame for simplicity
+  
+  # keep only recent outreach events (in 2020 only)
+  filter(start_activity_date %like% &quot;/2020&quot;) %&gt;% 
+
+  # group by tract, activity type and activity date
+  group_by(GEOID, `Reporting Organization Name`, month) %&gt;% 
+
+  # get a count of activities &amp; total number of impressions
+  summarize(count = length(GEOID),
+            sum_impressions = sum(impressions, na.rm = T))
+
+head(pnt_org_month_sum)  </code></pre>
+<pre><code>## # A tibble: 6 x 5
+## # Groups:   GEOID, Reporting Organization Name [6]
+##   GEOID    `Reporting Organization Name`        month count sum_impressions
+##   &lt;chr&gt;    &lt;chr&gt;                                &lt;chr&gt; &lt;int&gt;           &lt;dbl&gt;
+## 1 0603710~ Child Care Resource Center Inc       5         1             100
+## 2 0603710~ Consejo de Federaciones Mexicanas e~ 4         1             225
+## 3 0603710~ Community Partners fbo Latino Equal~ 2         1              45
+## 4 0603710~ LA City                              2         1              30
+## 5 0603710~ LA City                              1         1              30
+## 6 0603711~ LA City                              2         1              12</code></pre>
+</div>
+<div id="merge-point-and-polygon-outreach-data" class="section level4">
+<h4>Merge point and polygon outreach data</h4>
+<pre class="r"><code># bind dataframes long-wise
+
+# counts and impressions of activities by month
+org_month_sum &lt;-
+  
+  # rbind points to polygons
+bind_rows(
+pnt_org_month_sum,
+
+  # prepare polygons
+out_org_month_sum %&gt;% 
+  filter(level ==&quot;tract&quot;) %&gt;% 
+  rename(&quot;GEOID&quot;=tract) %&gt;% 
+  ungroup %&gt;% select(-level)) %&gt;% 
+  
+  # summarize by geoid, activity type and month to get total counta nd impressions
+  group_by(GEOID, `Reporting Organization Name`,  month) %&gt;% 
+  summarize(count_act = sum(count, na.rm = T),
+            sum_impressions = sum(sum_impressions, na.rm = T))</code></pre>
+</div>
+</div>
+<div id="summarize-by-activity-type-and-tract" class="section level3">
+<h3>Summarize by Activity Type and Tract</h3>
+<div id="summarize-polygons-1" class="section level4">
 <h4>Summarize Polygons</h4>
 <ul>
 <li>keep only 2020 outreach events.<br />
@@ -706,7 +804,7 @@ out_month_sum &lt;-
 
 #table(out_month_sum$month, useNA = &quot;always&quot;)</code></pre>
 </div>
-<div id="summarize-points" class="section level4">
+<div id="summarize-points-1" class="section level4">
 <h4>Summarize Points</h4>
 <ul>
 <li>keep only 2020 outreach events.<br />
@@ -755,9 +853,8 @@ pnt_month_sum &lt;-
   summarize(count = length(GEOID),
             sum_impressions = sum(impressions, na.rm = T))</code></pre>
 </div>
-</div>
-<div id="merge-point-and-polygon-outreach-data" class="section level3">
-<h3>Merge point and polygon outreach data</h3>
+<div id="merge-point-and-polygon-outreach-data-1" class="section level4">
+<h4>Merge point and polygon outreach data</h4>
 <pre class="r"><code># bind dataframes long-wise
 
 # counts and impressions of activities by month
@@ -797,8 +894,8 @@ out_month_sum %&gt;%
   summarize(count_act = sum(count, na.rm = T),
             sum_impressions = sum(sum_impressions, na.rm = T))</code></pre>
 </div>
-<div id="recode-activity-data-where-necessary" class="section level3">
-<h3>Recode activity data where necessary</h3>
+<div id="recode-activity-data-where-necessary" class="section level4">
+<h4>Recode activity data where necessary</h4>
 <ul>
 <li>for some of the longer activity type names, recode to group with other relevant categories</li>
 </ul>
@@ -808,13 +905,75 @@ act_month_sum$activity[act_month_sum$activity == &quot;Van outfitted with loudsp
 
 # table(act_month_sum$activity, useNA = &quot;always&quot;)</code></pre>
 </div>
-<div id="where-are-the-gaps-in-outreach" class="section level3">
-<h3>1. Where are the gaps in outreach?</h3>
 </div>
+</div>
+<div id="who-is-doing-outreach-where" class="section level2">
+<h2>1. Who is doing outreach where?</h2>
+<p>HTC and non-HTC tracts</p>
+<pre class="r"><code>#### HTC Tracts 
+# join htc data to outreach activity data. filter only tracts with HTC of 57+ 
+org_tracts_outreach_htc &lt;- 
+org_month_sum %&gt;% 
+  rename(&quot;reporting_org&quot;=`Reporting Organization Name`) %&gt;% 
+  filter(month %in% c(&quot;5&quot;, &quot;6&quot;)) %&gt;% 
+  
+  # sum for may and june
+  group_by(GEOID, reporting_org ) %&gt;% 
+  
+  summarize(count_act = sum(count_act, na.rm=T),
+            sum_impressions = sum(sum_impressions, na.rm = T)) %&gt;% 
+
+ # join regions to tracts
+  full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
+  
+  # keep only HTC tracts 
+  filter(!is.na(GEOID) &amp; htc &gt;= 57) %&gt;%
+  
+  mutate(sum_impressions = ifelse(is.na(sum_impressions), 0, sum_impressions),
+         count_act = ifelse(is.na(count_act), 0, count_act)) %&gt;% 
+  
+  # join group quarters
+  left_join(gq_tract, by=&quot;GEOID&quot;) 
+  
+
+### All tracts 
+
+# join htc data to outreach activity data. 
+org_tracts_outreach &lt;- 
+org_month_sum %&gt;% 
+  rename(&quot;reporting_org&quot;=`Reporting Organization Name`) %&gt;% 
+  filter(month %in% c(&quot;5&quot;, &quot;6&quot;)) %&gt;% 
+  
+  # sum for may and june
+  group_by(GEOID, reporting_org) %&gt;% 
+  
+  summarize(count_act = sum(count_act, na.rm=T),
+            sum_impressions = sum(sum_impressions, na.rm = T)) %&gt;% 
+
+ # join regions to tracts
+  full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
+  
+  # keep only HTC tracts 
+  filter(!is.na(GEOID) &amp; !is.na(regn_nm)) %&gt;%
+  
+  mutate(sum_impressions = ifelse(is.na(sum_impressions), 0, sum_impressions),
+         count_act = ifelse(is.na(count_act), 0, count_act)) %&gt;% 
+  
+  # join group quarters
+  left_join(gq_tract, by=&quot;GEOID&quot;) 
+
+
+# export outreach data by reporting organization
+write.csv(org_tracts_outreach_htc, paste0(root, &quot;outreach/tracts_org_outreach_htc_0604.csv&quot;), row.names = FALSE)
+
+write.csv(org_tracts_outreach, paste0(root, &quot;outreach/tracts_org_outreach_0604.csv&quot;), row.names = FALSE)</code></pre>
+</div>
+<div id="where-are-the-gaps-in-outreach-what-activities-are-taking-place" class="section level2">
+<h2>2. Where are the gaps in outreach? What activities are taking place?</h2>
 <div id="for-htc-tracts-in-may-june" class="section level3">
 <h3>For HTC Tracts in May-June:</h3>
 <ol style="list-style-type: decimal">
-<li>Filter the months (May = 5, June = 6)<br />
+<li>Filter the months (May = 5, June = 6). Also query only HTC tract. For the quartile classification, query only tract with group quarters population less than 50<br />
 </li>
 <li>Sum activities and impressions across months.</li>
 <li>Join to the tract-regional crosswalk to get the region name and HTC score<br />
@@ -841,6 +1000,9 @@ act_month_sum %&gt;%
  # join regions to tracts
   full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
   
+  # join group quarters
+  left_join(gq_tract, by=&quot;GEOID&quot;) %&gt;% 
+
   # keep only HTC tracts 
   filter(!is.na(GEOID) &amp; htc &gt;= 57) %&gt;%
   
@@ -854,8 +1016,13 @@ tracts_outreach_htc &lt;-
 out_all_month_sum %&gt;% 
   filter(month %in% c(&quot;5&quot;, &quot;6&quot;)) %&gt;% 
   mutate(activity_type = &quot;all&quot;) %&gt;% 
+  
   full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
-  filter(!is.na(GEOID) &amp; htc &gt;= 57) %&gt;% 
+   # join group quarters
+  left_join(gq_tract, by=&quot;GEOID&quot;) %&gt;% 
+  
+   # keep only HTC tracts &amp; tracts with less than 50% of pop in group quarters
+  filter(!is.na(GEOID) &amp; htc &gt;= 57 &amp; gq_pop_pct &lt; 50) %&gt;% 
   
   # group by region and divide into quartiles
   group_by(regn_nm) %&gt;% 
@@ -878,16 +1045,16 @@ act_tracts_outreach_htc_sp &lt;- left_join(tractsp, act_tracts_outreach_htc, by=
 st_write(tracts_outreach_htc_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_htc_tracts_0604.geojson&quot;),  delete_dsn = TRUE)</code></pre>
 <pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_htc_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
 ## Writing layer `outreach_htc_tracts_0604&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_htc_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
-## Writing 2367 features with 17 fields and geometry type Multi Polygon.</code></pre>
+## Writing 2366 features with 23 fields and geometry type Multi Polygon.</code></pre>
 <pre class="r"><code>st_write(act_tracts_outreach_htc_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_activity_htc_tracts_0604.geojson&quot;),  delete_dsn = TRUE)</code></pre>
 <pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_htc_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
 ## Writing layer `outreach_activity_htc_tracts_0604&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_htc_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
-## Writing 2541 features with 16 fields and geometry type Multi Polygon.</code></pre>
+## Writing 2541 features with 22 fields and geometry type Multi Polygon.</code></pre>
 </div>
-<div id="for-all-tracts-in-may-june" class="section level3">
-<h3>For All Tracts in May-June:</h3>
+<div id="for-all-tracts-in-may" class="section level3">
+<h3>For All Tracts in May:</h3>
 <ol style="list-style-type: decimal">
-<li>Filter the activity and outreach data by month (May = 5, June =6)<br />
+<li>Filter the activity and outreach data by month (May = 5)<br />
 </li>
 <li>Join to the tract-regional crosswalk to get the region name and HTC score<br />
 </li>
@@ -915,6 +1082,9 @@ act_month_sum %&gt;%
  # join regions to tracts
   full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
   
+   # join group quarters
+  left_join(gq_tract, by=&quot;GEOID&quot;) %&gt;% 
+  
   # keep only HTC tracts 
   filter(!is.na(GEOID) &amp; !is.na(regn_nm)) %&gt;%
   
@@ -929,7 +1099,12 @@ out_all_month_sum %&gt;%
   filter(month %in% c(&quot;5&quot;, &quot;6&quot;)) %&gt;% 
   mutate(activity_type = &quot;all&quot;) %&gt;% 
   full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
-  filter(!is.na(GEOID) &amp; !is.na(regn_nm)) %&gt;% 
+  
+   # join group quarters
+  left_join(gq_tract, by=&quot;GEOID&quot;) %&gt;% 
+  
+   # keep only tracts with less than 50% of pop in group quarters
+  filter(!is.na(GEOID) &amp; !is.na(regn_nm) &amp; gq_pop_pct &lt; 50) %&gt;% 
   
   # group by region and divide into quartiles
   group_by(regn_nm) %&gt;% 
@@ -953,11 +1128,12 @@ act_tracts_outreach_sp &lt;- left_join(tractsp, act_tracts_outreach, by=&quot;GE
 st_write(tracts_outreach_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_tracts_0604.geojson&quot;),  delete_dsn = TRUE)</code></pre>
 <pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
 ## Writing layer `outreach_tracts_0604&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
-## Writing 2371 features with 17 fields and geometry type Multi Polygon.</code></pre>
+## Writing 2370 features with 23 fields and geometry type Multi Polygon.</code></pre>
 <pre class="r"><code>st_write(act_tracts_outreach_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_activity_tracts_0604.geojson&quot;),  delete_dsn = TRUE)</code></pre>
 <pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
 ## Writing layer `outreach_activity_tracts_0604&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
-## Writing 2572 features with 16 fields and geometry type Multi Polygon.</code></pre>
+## Writing 2572 features with 22 fields and geometry type Multi Polygon.</code></pre>
+</div>
 </div>
 
 
