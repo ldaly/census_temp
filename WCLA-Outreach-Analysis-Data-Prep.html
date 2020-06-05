@@ -1052,7 +1052,7 @@ out_all_month_sum %&gt;%
   left_join(gq_tract, by=&quot;GEOID&quot;) %&gt;% 
   
    # keep only HTC tracts &amp; tracts with less than 50% of pop in group quarters
-  filter(!is.na(GEOID) &amp; htc &gt;= 57 &amp; gq_pop_pct &lt; 50) %&gt;% 
+  filter(!is.na(GEOID) &amp; htc &gt;= 57 &amp; gq_pop_pct &lt; 50 &amp; GEOID !=&quot;06037277400&quot;) %&gt;% 
   
   # group by region and divide into quartiles
   group_by(regn_nm) %&gt;% 
@@ -1134,7 +1134,7 @@ out_all_month_sum %&gt;%
   left_join(gq_tract, by=&quot;GEOID&quot;) %&gt;% 
   
    # keep only tracts with less than 50% of pop in group quarters
-  filter(!is.na(GEOID) &amp; !is.na(regn_nm) &amp; gq_pop_pct &lt; 50) %&gt;% 
+  filter(!is.na(GEOID) &amp; !is.na(regn_nm) &amp; gq_pop_pct &lt; 50 &amp; GEOID !=&quot;06037277400&quot;) %&gt;% 
   
   # group by region and divide into quartiles
   group_by(regn_nm) %&gt;% 
