@@ -413,6 +413,11 @@ regs &lt;- regs[,c(1, 3, 4, 5)]
 regs$geoid &lt;- as.character(regs$geoid)
 
 
+# load city-tract crosswalk
+tract_city_rel &lt;- fread(paste0(root, &quot;Regions_APCA/tract_city_region_crosswalk.csv&quot;), 
+                        stringsAsFactors =  FALSE, data.table = FALSE,
+                        colClasses = c(&quot;GEOID&quot;=&quot;character&quot;, &quot;NAME&quot;=&quot;character&quot;))
+
 #### OUTREACH DATA ####
 # read in polygon outreach data/
 outreach_poly &lt;- fread(paste0(root, &quot;State Census Office/Outreach/download_20200604/Polygon layer_0.csv&quot;), 
@@ -963,10 +968,35 @@ org_month_sum %&gt;%
   left_join(gq_tract, by=&quot;GEOID&quot;) 
 
 
+
 # export outreach data by reporting organization
+# for HTC tracts
 write.csv(org_tracts_outreach_htc, paste0(root, &quot;outreach/tracts_org_outreach_htc_0604.csv&quot;), row.names = FALSE)
 
-write.csv(org_tracts_outreach, paste0(root, &quot;outreach/tracts_org_outreach_0604.csv&quot;), row.names = FALSE)</code></pre>
+# For all tracts
+write.csv(org_tracts_outreach, paste0(root, &quot;outreach/tracts_org_outreach_all_0604.csv&quot;), row.names = FALSE)</code></pre>
+<div id="join-neighborhood-data-and-summarize-by-neighborhood" class="section level3">
+<h3>Join neighborhood data and summarize by neighborhood</h3>
+<pre class="r"><code>activities_who &lt;- 
+org_tracts_outreach %&gt;% 
+ # filter(regn_nm ==unique(dat$region_name)) %&gt;% 
+  filter(!is.na(reporting_org)) %&gt;% 
+  
+  # join neighborhoods
+  left_join(tract_city_rel %&gt;% 
+              select(GEOID, neighbrhd_name, NAME, city), by= &quot;GEOID&quot;) %&gt;% 
+  
+  group_by(neighbrhd_name, reporting_org, regn_nm) %&gt;% 
+  summarize(count_act = sum(count_act, na.rm = T),
+            sum_impressions = sum(sum_impressions, na.rm = T))
+
+
+
+# export outreach data summarized by reporting organization and neighborhood
+
+# For all tracts - summarized by neighborhood
+write.csv(activities_who, paste0(root, &quot;outreach/neighborhood_sum_org_outreach_0604.csv&quot;), row.names = FALSE)</code></pre>
+</div>
 </div>
 <div id="where-are-the-gaps-in-outreach-what-activities-are-taking-place" class="section level2">
 <h2>2. Where are the gaps in outreach? What activities are taking place?</h2>
@@ -1133,6 +1163,29 @@ st_write(tracts_outreach_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outr
 <pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
 ## Writing layer `outreach_activity_tracts_0604&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_tracts_0604.geojson&#39; using driver `GeoJSON&#39;
 ## Writing 2572 features with 22 fields and geometry type Multi Polygon.</code></pre>
+</div>
+<div id="join-neighborhoods-and-summarize-outreach-activities-by-neighborhood" class="section level3">
+<h3>Join neighborhoods and summarize outreach activities by neighborhood</h3>
+<pre class="r"><code>activities_where &lt;- 
+act_tracts_outreach %&gt;% 
+  mutate(activity = recode(activity,
+                           media_other = &quot;other media&quot;,
+                           activity_type_other = &quot;other&quot;,
+                           nudgealert = &quot;nudge alert&quot;,
+                           phone_banking = &quot;phone banking&quot;)) %&gt;% 
+  filter(!is.na(activity)) %&gt;% 
+  
+  # join neighborhoods
+  left_join(tract_city_rel %&gt;% 
+              select(GEOID, neighbrhd_name, NAME, city), by= &quot;GEOID&quot;) %&gt;% 
+  
+  group_by(neighbrhd_name, activity, regn_nm) %&gt;% 
+  summarize(count_act = sum(count_act, na.rm = T),
+            sum_impressions = sum(sum_impressions, na.rm = T))
+
+
+# export outreach data by activity summarized by neighborhood. 
+write.csv(activities_where, paste0(root, &quot;outreach/neighborhood_sum_all_activity_outreach_0604.csv&quot;), row.names = FALSE)</code></pre>
 </div>
 </div>
 
