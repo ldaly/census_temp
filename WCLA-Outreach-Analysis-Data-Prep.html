@@ -382,7 +382,6 @@ root &lt;- &quot;W:/Project/RDA Team/Census2020/data/&quot;
 
 cb_root &lt;- &quot;W:/Base/CBF/census_2018_cartographic_boundary_files/&quot;
 
-
 # load spatial  tract data 
 tractsp &lt;- st_read(paste0(cb_root, &quot;cb_2018_06_tract_500k/cb_2018_06_tract_500k.shp&quot;), stringsAsFactors = FALSE)</code></pre>
 <pre><code>## Reading layer `cb_2018_06_tract_500k&#39; from data source `W:\Base\CBF\census_2018_cartographic_boundary_files\cb_2018_06_tract_500k\cb_2018_06_tract_500k.shp&#39; using driver `ESRI Shapefile&#39;
@@ -478,10 +477,18 @@ outreach_poly$activity &lt;- ifelse(outreach_poly$`Activity Type` ==&quot;activi
 # table(outreach_poly$activity, useNA = &quot;always&quot;)
 # dim(outreach_poly)
 
+# organization -- combine primary organizer wiht parent org (if there is no data for primary organizer)
+outreach_poly$organizer &lt;- 
+  ifelse(outreach_poly$`Primary Organizer`==&quot;&quot;, outreach_poly$`Reporting Organization Name`,
+         outreach_poly$`Primary Organizer`)
+
+# table(outreach_poly$organizer, useNA = &quot;always&quot;)
+# head(subset(outreach_poly, organizer ==&quot;&quot;))
+         
 
 ### clean up outreach point data
 # there is a record from 2019 where the XY fields got scrambled and instead the X value has the report source value. remove
-outreach_pnt &lt;- outreach_pnt[outreach_pnt$x !=&quot;API&quot;, c(3:16, 36:46, 99:103)]
+outreach_pnt &lt;- outreach_pnt[outreach_pnt$x !=&quot;API&quot;, c(3:16, 20, 36:46, 99:103)]
 
 outreach_pnt$x &lt;- as.numeric(outreach_pnt$x)
 
@@ -520,7 +527,12 @@ outreach_pnt$activity &lt;- ifelse(outreach_pnt$`Activity Type` ==&quot;activity
                                  outreach_pnt$`Activity Type`)
 
 # verify
-# table(outreach_pnt$activity, useNA = &quot;always&quot;)</code></pre>
+# table(outreach_pnt$activity, useNA = &quot;always&quot;)
+
+# organization -- combine primary organizer wiht parent org (if there is no data for primary organizer)
+outreach_pnt$organizer &lt;- 
+  ifelse(outreach_pnt$`Primary Organizer`==&quot;&quot;, outreach_pnt$`Reporting Organization Name`,
+         outreach_pnt$`Primary Organizer`)</code></pre>
 </div>
 <div id="spatial-join-points-to-tracts" class="section level3">
 <h3>Spatial join points to tracts</h3>
@@ -547,7 +559,7 @@ pnt_tract &lt;- st_join(tractsp_prj, pnt_prj)
 # Verify tracts have been duplicated where there are multiple points
 # review
 subset(pnt_tract, GEOID==&quot;06037482503&quot;)</code></pre>
-<pre><code>## Simple feature collection with 6 features and 41 fields
+<pre><code>## Simple feature collection with 6 features and 43 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
 ## bbox:           xmin: 175426.9 ymin: -438414 xmax: 176276 ymax: -437442.4
@@ -588,34 +600,34 @@ subset(pnt_tract, GEOID==&quot;06037482503&quot;)</code></pre>
 ## 1037.3                1/23/2020 0:00                                
 ## 1037.4                1/23/2020 0:00                                
 ## 1037.5                2/11/2020 0:00                                
-##        How Assisted Event Name Total number of alert sign-ups
-## 1037                                                       NA
-## 1037.1                                                     NA
-## 1037.2                                                     NA
-## 1037.3                                                     NA
-## 1037.4                                                     NA
-## 1037.5                                                     NA
-##        Total people spoken to Total number of houses
-## 1037                       NA                     NA
-## 1037.1                     NA                     NA
-## 1037.2                     NA                     NA
-## 1037.3                     NA                     NA
-## 1037.4                     NA                     NA
-## 1037.5                     NA                     NA
-##        Total collateral/flyers/material distributed Total number assisted
-## 1037                                             NA                    NA
-## 1037.1                                           NA                    NA
-## 1037.2                                           NA                    NA
-## 1037.3                                           NA                    NA
-## 1037.4                                           NA                    NA
-## 1037.5                                           NA                    NA
-##        Average number of miles travelled
-## 1037                                  NA
-## 1037.1                                NA
-## 1037.2                                NA
-## 1037.3                                NA
-## 1037.4                                NA
-## 1037.5                                NA
+##        How Assisted Event Name Primary Organizer
+## 1037                            garveyelementary
+## 1037.1                          garveyelementary
+## 1037.2                          garveyelementary
+## 1037.3                          garveyelementary
+## 1037.4                          garveyelementary
+## 1037.5                          garveyelementary
+##        Total number of alert sign-ups Total people spoken to
+## 1037                               NA                     NA
+## 1037.1                             NA                     NA
+## 1037.2                             NA                     NA
+## 1037.3                             NA                     NA
+## 1037.4                             NA                     NA
+## 1037.5                             NA                     NA
+##        Total number of houses Total collateral/flyers/material distributed
+## 1037                       NA                                           NA
+## 1037.1                     NA                                           NA
+## 1037.2                     NA                                           NA
+## 1037.3                     NA                                           NA
+## 1037.4                     NA                                           NA
+## 1037.5                     NA                                           NA
+##        Total number assisted Average number of miles travelled
+## 1037                      NA                                NA
+## 1037.1                    NA                                NA
+## 1037.2                    NA                                NA
+## 1037.3                    NA                                NA
+## 1037.4                    NA                                NA
+## 1037.5                    NA                                NA
 ##        Total number of paid staff/volunteers Total number nudged/alerted
 ## 1037                                      NA                          NA
 ## 1037.1                                    NA                          NA
@@ -651,13 +663,13 @@ subset(pnt_tract, GEOID==&quot;06037482503&quot;)</code></pre>
 ## 1037.3           1/23/2020          19     1           meeting
 ## 1037.4           1/23/2020          19     1 training_delivery
 ## 1037.5           2/11/2020          18     2 training_delivery
-##                              geometry
-## 1037   MULTIPOLYGON (((175426.9 -4...
-## 1037.1 MULTIPOLYGON (((175426.9 -4...
-## 1037.2 MULTIPOLYGON (((175426.9 -4...
-## 1037.3 MULTIPOLYGON (((175426.9 -4...
-## 1037.4 MULTIPOLYGON (((175426.9 -4...
-## 1037.5 MULTIPOLYGON (((175426.9 -4...</code></pre>
+##               organizer                       geometry
+## 1037   garveyelementary MULTIPOLYGON (((175426.9 -4...
+## 1037.1 garveyelementary MULTIPOLYGON (((175426.9 -4...
+## 1037.2 garveyelementary MULTIPOLYGON (((175426.9 -4...
+## 1037.3 garveyelementary MULTIPOLYGON (((175426.9 -4...
+## 1037.4 garveyelementary MULTIPOLYGON (((175426.9 -4...
+## 1037.5 garveyelementary MULTIPOLYGON (((175426.9 -4...</code></pre>
 </div>
 </div>
 <div id="summarize-outreach-data" class="section level2">
@@ -696,6 +708,31 @@ head(out_org_month_sum)</code></pre>
 ## 4 county 0     Child Care Resource Center Inc   5       120         3447733
 ## 5 county 0     Consejo de Federaciones Mexican~ 3         2           44289
 ## 6 county 0     Consejo de Federaciones Mexican~ 4        86         9508324</code></pre>
+<pre class="r"><code># summarize activities by tract by month
+out_priorg_month_sum &lt;- 
+  outreach_poly %&gt;% 
+  
+  # keep only recent outreach events (in 2020 only)
+  filter(start_activity_date %like% &quot;/2020&quot;) %&gt;% 
+
+  # group by tract, activity type and activity date
+  group_by(level, tract, organizer, month) %&gt;% 
+
+  # get a count of activities &amp; total number of impressions
+  summarize(count = length(tract),
+            sum_impressions = sum(impressions, na.rm = T))
+
+head(out_priorg_month_sum)</code></pre>
+<pre><code>## # A tibble: 6 x 6
+## # Groups:   level, tract, organizer [2]
+##   level  tract organizer                        month count sum_impressions
+##   &lt;chr&gt;  &lt;chr&gt; &lt;chr&gt;                            &lt;chr&gt; &lt;int&gt;           &lt;dbl&gt;
+## 1 county 0     A New Way of Life Reentry Proje~ 3         1            2825
+## 2 county 0     A New Way of Life Reentry Proje~ 4         2            5826
+## 3 county 0     A New Way of Life Reentry Proje~ 5         1            1848
+## 4 county 0     AltaMed Health Services Corp     3         1          322374
+## 5 county 0     AltaMed Health Services Corp     4         2        11126434
+## 6 county 0     AltaMed Health Services Corp     5         1            7992</code></pre>
 </div>
 <div id="summarize-points" class="section level4">
 <h4>Summarize Points</h4>
@@ -729,6 +766,31 @@ head(pnt_org_month_sum)  </code></pre>
 ## 4 0603710~ LA City                              2         1              30
 ## 5 0603710~ LA City                              1         1              30
 ## 6 0603711~ LA City                              2         1              12</code></pre>
+<pre class="r"><code>pnt_priorg_month_sum &lt;- 
+  pnt_tract %&gt;% 
+  as.data.frame() %&gt;%   # convert to data frame for simplicity
+  
+  # keep only recent outreach events (in 2020 only)
+  filter(start_activity_date %like% &quot;/2020&quot;) %&gt;% 
+
+  # group by tract, activity type and activity date
+  group_by(GEOID, organizer, month) %&gt;% 
+
+  # get a count of activities &amp; total number of impressions
+  summarize(count = length(GEOID),
+            sum_impressions = sum(impressions, na.rm = T))
+
+head(pnt_priorg_month_sum)  </code></pre>
+<pre><code>## # A tibble: 6 x 5
+## # Groups:   GEOID, organizer [5]
+##   GEOID      organizer                          month count sum_impressions
+##   &lt;chr&gt;      &lt;chr&gt;                              &lt;chr&gt; &lt;int&gt;           &lt;dbl&gt;
+## 1 060371043~ El Nido Family Centers             4         1             225
+## 2 060371043~ El Nido Family Centers             5         1             100
+## 3 060371046~ NALEO Educational Fund             2         1              45
+## 4 060371046~ Pacoima Beautiful                  2         1              30
+## 5 060371066~ Secretary of State Alex Padilla&#39;s~ 1         1              30
+## 6 060371133~ Archdiocese                        2         1              12</code></pre>
 </div>
 <div id="merge-point-and-polygon-outreach-data" class="section level4">
 <h4>Merge point and polygon outreach data</h4>
@@ -749,6 +811,26 @@ out_org_month_sum %&gt;%
   
   # summarize by geoid, activity type and month to get total counta nd impressions
   group_by(GEOID, `Reporting Organization Name`,  month) %&gt;% 
+  summarize(count_act = sum(count, na.rm = T),
+            sum_impressions = sum(sum_impressions, na.rm = T))
+
+
+
+# counts and impressions of activities by month - PRIMARY ORGANIZER
+priorg_month_sum &lt;-
+  
+  # rbind points to polygons
+bind_rows(
+pnt_priorg_month_sum,
+
+  # prepare polygons
+out_priorg_month_sum %&gt;% 
+  filter(level ==&quot;tract&quot;) %&gt;% 
+  rename(&quot;GEOID&quot;=tract) %&gt;% 
+  ungroup %&gt;% select(-level)) %&gt;% 
+  
+  # summarize by geoid, activity type and month to get total counta nd impressions
+  group_by(GEOID, organizer,  month) %&gt;% 
   summarize(count_act = sum(count, na.rm = T),
             sum_impressions = sum(sum_impressions, na.rm = T))</code></pre>
 </div>
@@ -915,7 +997,7 @@ act_month_sum$activity[act_month_sum$activity == &quot;Van outfitted with loudsp
 <div id="who-is-doing-outreach-where" class="section level2">
 <h2>1. Who is doing outreach where?</h2>
 <p>HTC and non-HTC tracts</p>
-<pre class="r"><code>#### HTC Tracts 
+<pre class="r"><code>#### Organizers in  HTC Tracts  #####
 # join htc data to outreach activity data. filter only tracts with HTC of 57+ 
 org_tracts_outreach_htc &lt;- 
 org_month_sum %&gt;% 
@@ -941,7 +1023,7 @@ org_month_sum %&gt;%
   left_join(gq_tract, by=&quot;GEOID&quot;) 
   
 
-### All tracts 
+### Organizers in All tracts ##### 
 
 # join htc data to outreach activity data. 
 org_tracts_outreach &lt;- 
@@ -967,6 +1049,30 @@ org_month_sum %&gt;%
   # join group quarters
   left_join(gq_tract, by=&quot;GEOID&quot;) 
 
+#### Primary organizers in all tracts ####
+# join htc data to outreach activity data. 
+priorg_tracts_outreach &lt;- 
+priorg_month_sum  %&gt;% 
+  filter(month %in% c(&quot;5&quot;, &quot;6&quot;)) %&gt;% 
+  
+  # sum for may and june
+  group_by(GEOID, organizer) %&gt;% 
+  
+  summarize(count_act = sum(count_act, na.rm=T),
+            sum_impressions = sum(sum_impressions, na.rm = T)) %&gt;% 
+
+ # join regions to tracts
+  full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
+  
+  # keep only HTC tracts 
+  filter(!is.na(GEOID) &amp; !is.na(regn_nm)) %&gt;%
+  
+  mutate(sum_impressions = ifelse(is.na(sum_impressions), 0, sum_impressions),
+         count_act = ifelse(is.na(count_act), 0, count_act)) %&gt;% 
+  
+  # join group quarters
+  left_join(gq_tract, by=&quot;GEOID&quot;) 
+
 
 
 # export outreach data by reporting organization
@@ -974,19 +1080,22 @@ org_month_sum %&gt;%
 write.csv(org_tracts_outreach_htc, paste0(root, &quot;outreach/tracts_org_outreach_htc_0604.csv&quot;), row.names = FALSE)
 
 # For all tracts
-write.csv(org_tracts_outreach, paste0(root, &quot;outreach/tracts_org_outreach_all_0604.csv&quot;), row.names = FALSE)</code></pre>
+write.csv(org_tracts_outreach, paste0(root, &quot;outreach/tracts_org_outreach_all_0604.csv&quot;), row.names = FALSE)
+
+# For primary organizers in all tracts
+write.csv(priorg_tracts_outreach, paste0(root, &quot;outreach/tracts_primary_org_outreach_all_0604.csv&quot;), row.names = FALSE)</code></pre>
 <div id="join-neighborhood-data-and-summarize-by-neighborhood" class="section level3">
 <h3>Join neighborhood data and summarize by neighborhood</h3>
 <pre class="r"><code>activities_who &lt;- 
-org_tracts_outreach %&gt;% 
- # filter(regn_nm ==unique(dat$region_name)) %&gt;% 
-  filter(!is.na(reporting_org)) %&gt;% 
+priorg_tracts_outreach %&gt;% 
+
+  filter(!is.na(organizer)) %&gt;% 
   
   # join neighborhoods
   left_join(tract_city_rel %&gt;% 
               select(GEOID, neighbrhd_name, NAME, city), by= &quot;GEOID&quot;) %&gt;% 
   
-  group_by(neighbrhd_name, reporting_org, regn_nm) %&gt;% 
+  group_by(neighbrhd_name, organizer, regn_nm) %&gt;% 
   summarize(count_act = sum(count_act, na.rm = T),
             sum_impressions = sum(sum_impressions, na.rm = T))
 
