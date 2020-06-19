@@ -489,7 +489,7 @@ outreach_poly$activity &lt;-
   ifelse(outreach_poly$`Activity Type` ==&quot;activity_type_other&quot; &amp; outreach_poly$`Other - Activity Type`==&quot;&quot; &amp; (outreach_poly$Description !=&quot;&quot; &amp; !outreach_poly$Description %like% &quot;Total adults: &quot;), 
          word(outreach_poly$Description, 1, 7), 
   ifelse(outreach_poly$`Activity Type` ==&quot;activity_type_other&quot; &amp; outreach_poly$`Other - Activity Type`==&quot;&quot; &amp; outreach_poly$Description %like% &quot;Total adults: &quot;, 
-         &quot;phone banking-PDI&quot;,
+         &quot;phone banking&quot;,
   ifelse(outreach_poly$`Activity Type` ==&quot;activity_type_other&quot; &amp; outreach_poly$`Other - Activity Type`==&quot;&quot; &amp; outreach_poly$Description ==&quot;&quot;, &quot;other&quot;,
          outreach_poly$activity)))
 
@@ -1040,34 +1040,33 @@ act_month_sum$activity &lt;- gsub(&quot;_&quot;, &quot; &quot;, act_month_sum$ac
 ##  [5] &quot;event&quot;                                        
 ##  [6] &quot;flyers&quot;                                       
 ##  [7] &quot;training delivery&quot;                            
-##  [8] &quot;phone banking-PDI&quot;                            
-##  [9] &quot;booths&quot;                                       
-## [10] &quot;advertising&quot;                                  
-## [11] &quot;convening&quot;                                    
-## [12] &quot;speaking engagement&quot;                          
-## [13] &quot;postcard to small business&quot;                   
-## [14] &quot;nudge alert&quot;                                  
-## [15] &quot;collateral&quot;                                   
-## [16] &quot;presentation&quot;                                 
-## [17] &quot;meeting&quot;                                      
-## [18] &quot;Census Staff and partners marched together at&quot;
-## [19] &quot;webinar&quot;                                      
-## [20] &quot;mail&quot;                                         
-## [21] &quot;Census staff marched in Kingdom Day Parade&quot;   
-## [22] &quot;Van with census ads and loudspeakers&quot;         
-## [23] &quot;education forum&quot;                              
-## [24] &quot;social media&quot;                                 
-## [25] &quot;Event: Feed seniors&quot;                          
-## [26] &quot;media other&quot;                                  
-## [27] &quot;school rally&quot;                                 
-## [28] &quot;curriculum&quot;                                   
-## [29] &quot;postcard to private residence&quot;                
-## [30] &quot;hiring and recruitment&quot;                       
-## [31] &quot;implementation planning workshop&quot;             
-## [32] &quot;other&quot;                                        
-## [33] &quot;implementation planning worksho&quot;              
-## [34] &quot;ccc meeting&quot;                                  
-## [35] &quot;census action kiosk&quot;</code></pre>
+##  [8] &quot;booths&quot;                                       
+##  [9] &quot;advertising&quot;                                  
+## [10] &quot;convening&quot;                                    
+## [11] &quot;speaking engagement&quot;                          
+## [12] &quot;postcard to small business&quot;                   
+## [13] &quot;nudge alert&quot;                                  
+## [14] &quot;collateral&quot;                                   
+## [15] &quot;presentation&quot;                                 
+## [16] &quot;meeting&quot;                                      
+## [17] &quot;Census Staff and partners marched together at&quot;
+## [18] &quot;webinar&quot;                                      
+## [19] &quot;mail&quot;                                         
+## [20] &quot;Census staff marched in Kingdom Day Parade&quot;   
+## [21] &quot;Van with census ads and loudspeakers&quot;         
+## [22] &quot;education forum&quot;                              
+## [23] &quot;social media&quot;                                 
+## [24] &quot;Event: Feed seniors&quot;                          
+## [25] &quot;media other&quot;                                  
+## [26] &quot;school rally&quot;                                 
+## [27] &quot;curriculum&quot;                                   
+## [28] &quot;postcard to private residence&quot;                
+## [29] &quot;hiring and recruitment&quot;                       
+## [30] &quot;implementation planning workshop&quot;             
+## [31] &quot;other&quot;                                        
+## [32] &quot;implementation planning worksho&quot;              
+## [33] &quot;ccc meeting&quot;                                  
+## [34] &quot;census action kiosk&quot;</code></pre>
 </div>
 </div>
 </div>
