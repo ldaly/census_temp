@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
@@ -331,6 +330,7 @@ summary {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -379,14 +379,13 @@ library(foreign)
 library(stringr)
 
 # wd path
-root &lt;- &quot;W:/Project/RDA Team/Census2020/data/&quot;
-
-cb_root &lt;- &quot;W:/Base/CBF/census_2018_cartographic_boundary_files/&quot;
+root &lt;- &quot;C:/Users/LDaly/Desktop/Census2020/data/&quot;
+cb_root &lt;- &quot;C:/Users/LDaly/Desktop/uscb_cartographic_boundaries/&quot;
 
 ### load data that doesn&#39;t change ####
 # load spatial  tract data 
 tractsp &lt;- st_read(paste0(cb_root, &quot;cb_2018_06_tract_500k/cb_2018_06_tract_500k.shp&quot;), stringsAsFactors = FALSE)</code></pre>
-<pre><code>## Reading layer `cb_2018_06_tract_500k&#39; from data source `W:\Base\CBF\census_2018_cartographic_boundary_files\cb_2018_06_tract_500k\cb_2018_06_tract_500k.shp&#39; using driver `ESRI Shapefile&#39;
+<pre><code>## Reading layer `cb_2018_06_tract_500k&#39; from data source `C:\Users\LDaly\Desktop\uscb_cartographic_boundaries\cb_2018_06_tract_500k\cb_2018_06_tract_500k.shp&#39; using driver `ESRI Shapefile&#39;
 ## Simple feature collection with 8041 features and 9 fields
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
@@ -792,7 +791,8 @@ head(pnt_org_month_sum)  </code></pre>
 ## 4 0603710~ LA City                              2         1              30
 ## 5 0603710~ LA City                              1         1              30
 ## 6 0603711~ LA City                              2         1              12</code></pre>
-<pre class="r"><code>pnt_priorg_month_sum &lt;- 
+<pre class="r"><code># primary organizer
+pnt_priorg_month_sum &lt;- 
   pnt_tract %&gt;% 
   as.data.frame() %&gt;%   # convert to data frame for simplicity
   
@@ -1100,7 +1100,7 @@ org_month_sum %&gt;%
   left_join(gq_tract, by=&quot;GEOID&quot;) 
   
 
-### Organizers in All tracts ##### 
+#### Organizers in All tracts ##### 
 
 # join htc data to outreach activity data. 
 org_tracts_outreach &lt;- 
@@ -1140,6 +1140,7 @@ priorg_month_sum  %&gt;%
 
  # join regions to tracts
   full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
+  left_join(tract_city_rel %&gt;% select(-NAME, -region), by=&quot;GEOID&quot;) %&gt;% 
   
   # keep only HTC tracts 
   filter(!is.na(GEOID) &amp; !is.na(regn_nm)) %&gt;%
@@ -1168,9 +1169,9 @@ priorg_tracts_outreach %&gt;%
 
   filter(!is.na(organizer)) %&gt;% 
   
-  # join neighborhoods
-  left_join(tract_city_rel %&gt;% 
-              select(GEOID, neighbrhd_name, NAME, city), by= &quot;GEOID&quot;) %&gt;% 
+  # # join neighborhoods
+  # left_join(tract_city_rel %&gt;% 
+  #             select(GEOID, neighbrhd_name, NAME, city), by= &quot;GEOID&quot;) %&gt;% 
   
   group_by(neighbrhd_name, organizer, regn_nm) %&gt;% 
   summarize(count_act = sum(count_act, na.rm = T),
@@ -1259,16 +1260,20 @@ act_tracts_outreach_htc_sp &lt;- left_join(tractsp, act_tracts_outreach_htc, by=
 
 # export spatial data
 st_write(tracts_outreach_htc_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_htc_tracts_0618.geojson&quot;),  delete_dsn = TRUE)</code></pre>
-<pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_htc_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
-## Writing layer `outreach_htc_tracts_0618&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_htc_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
-## Writing 2411 features with 23 fields and geometry type Multi Polygon.</code></pre>
+<pre><code>## Deleting source `C:/Users/LDaly/Desktop/Census2020/data/outreach/outreach_htc_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `outreach_htc_tracts_0618&#39; to data source `C:/Users/LDaly/Desktop/Census2020/data/outreach/outreach_htc_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
+## features:       2411
+## fields:         23
+## geometry type:  Multi Polygon</code></pre>
 <pre class="r"><code>st_write(act_tracts_outreach_htc_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_activity_htc_tracts_0618.geojson&quot;),  delete_dsn = TRUE)</code></pre>
-<pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_htc_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
-## Writing layer `outreach_activity_htc_tracts_0618&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_htc_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
-## Writing 2659 features with 22 fields and geometry type Multi Polygon.</code></pre>
+<pre><code>## Deleting source `C:/Users/LDaly/Desktop/Census2020/data/outreach/outreach_activity_htc_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `outreach_activity_htc_tracts_0618&#39; to data source `C:/Users/LDaly/Desktop/Census2020/data/outreach/outreach_activity_htc_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
+## features:       2659
+## fields:         22
+## geometry type:  Multi Polygon</code></pre>
 </div>
-<div id="for-all-tracts-in-may" class="section level3">
-<h3>For All Tracts in May:</h3>
+<div id="for-all-tracts-in-may-june" class="section level3">
+<h3>For All Tracts in May-June:</h3>
 <ol style="list-style-type: decimal">
 <li>Filter the activity and outreach data by month (May = 5)<br />
 </li>
@@ -1308,8 +1313,7 @@ act_month_sum %&gt;%
          count_act = ifelse(is.na(count_act), 0, count_act))
 
 
-
-# join htc data to outreach data.
+# join htc data to outreach data--one version that includes group quarters tracts for the priority outreach table
 tracts_outreach &lt;- 
 out_all_month_sum %&gt;% 
   filter(month %in% c(&quot;5&quot;, &quot;6&quot;)) %&gt;% 
@@ -1318,6 +1322,23 @@ out_all_month_sum %&gt;%
   
    # join group quarters
   left_join(gq_tract, by=&quot;GEOID&quot;) %&gt;% 
+  left_join(tract_city_rel %&gt;% select(GEOID, neighbrhd_name, region_name), by=&quot;GEOID&quot;) %&gt;% 
+  
+   # keep only tracts with less than 50% of pop in group quarters
+  filter(!is.na(GEOID) &amp; !is.na(regn_nm) &amp; GEOID !=&quot;06037277400&quot;) 
+
+
+
+# join htc data to outreach data--one version with quartiles, for mapping, that excludes group quarters tracts
+tracts_outreach_quart &lt;- 
+out_all_month_sum %&gt;% 
+  filter(month %in% c(&quot;5&quot;, &quot;6&quot;)) %&gt;% 
+  mutate(activity_type = &quot;all&quot;) %&gt;% 
+  full_join(regs, by=c(&quot;GEOID&quot;=&quot;geoid&quot;)) %&gt;% 
+  
+   # join group quarters
+  left_join(gq_tract, by=&quot;GEOID&quot;) %&gt;% 
+  left_join(tract_city_rel %&gt;% select(GEOID, neighbrhd_name, region_name), by=&quot;GEOID&quot;) %&gt;% 
   
    # keep only tracts with less than 50% of pop in group quarters
   filter(!is.na(GEOID) &amp; !is.na(regn_nm) &amp; gq_pop_pct &lt; 50 &amp; GEOID !=&quot;06037277400&quot;) %&gt;% 
@@ -1337,18 +1358,22 @@ write.csv(act_tracts_outreach, paste0(root, &quot;outreach/tracts_all_activity_o
 
 
 # join to spatial tract data and export
-tracts_outreach_sp &lt;- left_join(tractsp, tracts_outreach, by=&quot;GEOID&quot;)
+tracts_outreach_sp &lt;- left_join(tractsp, tracts_outreach_quart, by=&quot;GEOID&quot;)
 act_tracts_outreach_sp &lt;- left_join(tractsp, act_tracts_outreach, by=&quot;GEOID&quot;)
 
 # export spatial data
 st_write(tracts_outreach_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_tracts_0618.geojson&quot;),  delete_dsn = TRUE)</code></pre>
-<pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
-## Writing layer `outreach_tracts_0618&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
-## Writing 2431 features with 23 fields and geometry type Multi Polygon.</code></pre>
+<pre><code>## Deleting source `C:/Users/LDaly/Desktop/Census2020/data/outreach/outreach_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `outreach_tracts_0618&#39; to data source `C:/Users/LDaly/Desktop/Census2020/data/outreach/outreach_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
+## features:       2431
+## fields:         25
+## geometry type:  Multi Polygon</code></pre>
 <pre class="r"><code>st_write(act_tracts_outreach_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;outreach/outreach_activity_tracts_0618.geojson&quot;),  delete_dsn = TRUE)</code></pre>
-<pre><code>## Deleting source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
-## Writing layer `outreach_activity_tracts_0618&#39; to data source `W:/Project/RDA Team/Census2020/data/outreach/outreach_activity_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
-## Writing 2697 features with 22 fields and geometry type Multi Polygon.</code></pre>
+<pre><code>## Deleting source `C:/Users/LDaly/Desktop/Census2020/data/outreach/outreach_activity_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `outreach_activity_tracts_0618&#39; to data source `C:/Users/LDaly/Desktop/Census2020/data/outreach/outreach_activity_tracts_0618.geojson&#39; using driver `GeoJSON&#39;
+## features:       2697
+## fields:         22
+## geometry type:  Multi Polygon</code></pre>
 </div>
 <div id="join-neighborhoods-and-summarize-outreach-activities-by-neighborhood" class="section level3">
 <h3>Join neighborhoods and summarize outreach activities by neighborhood</h3>
