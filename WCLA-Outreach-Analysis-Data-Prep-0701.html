@@ -364,7 +364,7 @@ summary {
 
 <h1 class="title toc-ignore">WCLA Outreach Analysis - Data Prep</h1>
 <h4 class="author">LD</h4>
-<h4 class="date">6/18/2020</h4>
+<h4 class="date">7/01/2020</h4>
 
 </div>
 
@@ -516,6 +516,14 @@ head(org_act_tract)</code></pre>
 ## 4 060371041~ California Community Foun~ phone bank~ tract 06             62
 ## 5 060371041~ Los Angeles County Census  phone bank~ tract 06             32
 ## 6 060371042~ California Community Foun~ phone bank~ tract 06             31</code></pre>
+<pre class="r"><code>org_act_tract_export &lt;- 
+  org_act_tract %&gt;% 
+ # join regions and neighborhood names to tracts
+  full_join(tract_city_rel %&gt;% 
+              select(-NAME, -region, -GEOID_city), by=&quot;GEOID&quot;) 
+  
+# # For all tracts
+write.csv(org_act_tract_export, paste0(root, &quot;outreach/tracts_act_org_outreach_all_0701.csv&quot;), row.names = FALSE)</code></pre>
 </div>
 </div>
 <div id="who-is-doing-outreach-where" class="section level2">
