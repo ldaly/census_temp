@@ -421,11 +421,11 @@ tract_city_rel &lt;- fread(paste0(root, &quot;Regions_APCA/tract_city_region_cro
 #### OUTREACH DATA ####
 # read in outreach data from state
 outreach_poly &lt;- fread(paste0(root, &quot;State Census Office/Outreach/received_20200701/ccf_la_all_2020june30.csv&quot;), 
-                  data.table=FALSE, stringsAsFactors = FALSE,fill=TRUE,
+                  data.table=FALSE, stringsAsFactors = FALSE,fill=TRUE, encoding = &quot;Latin-1&quot;,
                   colClasses = c(&quot;tract&quot;=&quot;character&quot;))
 
 
-# isn&#39;t really divided by point/polygon layers </code></pre>
+# isn&#39;t divided by point/polygon layers anymore </code></pre>
 </div>
 <div id="clean-up-outreach-data" class="section level3">
 <h3>Clean up outreach data</h3>
@@ -435,21 +435,32 @@ outreach_poly &lt;- fread(paste0(root, &quot;State Census Office/Outreach/receiv
 outreach_poly$tract &lt;- ifelse(outreach_poly$tract !=&quot;&quot;, paste0(&quot;0&quot;, outreach_poly$tract), NA)
 
 
-# get a month ID 
+# get a month ID for start date 
 outreach_poly$month &lt;- stri_match_first_regex(outreach_poly$date_of_activity, &quot;(.*?)\\/&quot;)[,2]
 
 table(outreach_poly$month, useNA = &quot;always&quot;) # verify</code></pre>
 <pre><code>## 
-##   06 &lt;NA&gt; 
-##  774    0</code></pre>
+##    1    2    3    4    5    6    7 &lt;NA&gt; 
+##  450 1099  951 1918 1444  330    1    0</code></pre>
+<pre class="r"><code># get a month ID for end date
+outreach_poly$month_end &lt;- stri_match_first_regex(outreach_poly$activity_end_date, &quot;(.*?)\\/&quot;)[,2]
+table(outreach_poly$month_end, useNA = &quot;always&quot;) # not many have month end dates but thats ok</code></pre>
+<pre><code>## 
+##   03    1   10    2    3    4    5    6    7    8 &lt;NA&gt; 
+##    2   61    7  107  129  311  270   64    1    1 5240</code></pre>
 <pre class="r"><code># make a geographic level field
 outreach_poly$level &lt;- ifelse(!is.na(outreach_poly$tract), &quot;tract&quot;, tolower(outreach_poly$address_type))
 table(outreach_poly$level, useNA = &quot;always&quot;)</code></pre>
 <pre><code>## 
-## county  tract   &lt;NA&gt; 
-##     27    747      0</code></pre>
+##   city county  tract   &lt;NA&gt; 
+##     46   1210   4937      0</code></pre>
 <pre class="r"><code>dim(outreach_poly)</code></pre>
-<pre><code>## [1] 774  14</code></pre>
+<pre><code>## [1] 6193   18</code></pre>
+<pre class="r"><code># remove weird tracts, or non-LA tracts
+outreach_poly &lt;- outreach_poly[(outreach_poly$tract %like% &quot;06037&quot; | outreach_poly$tract ==&quot;&quot;) &amp;  !is.na(outreach_poly$cbo_name), ]
+
+dim(outreach_poly)</code></pre>
+<pre><code>## [1] 6179   18</code></pre>
 <div id="recode-activities" class="section level4">
 <h4>Recode activities</h4>
 <p>Make sure the activity data is detailed as possible, i.e. no “other” category.</p>
@@ -460,42 +471,91 @@ outreach_poly$activity &lt;- ifelse(outreach_poly$activity_type ==&quot;other&qu
 outreach_poly$activity &lt;- gsub(&quot;_&quot;, &quot; &quot;, outreach_poly$activity)
 
 # review
-table(outreach_poly$activity) # see the results of the recoding</code></pre>
-<pre><code>## 
-##          canvassing          collateral               event 
-##                  31                   2                  26 
-##              flyers             meeting       phone banking 
-##                   2                   1                 688 
-##   Reactivate 8 QACs        social media speaking engagement 
-##                   1                   5                   4 
-##             webinar 
-##                  14</code></pre>
-<pre class="r"><code># only 1 &quot;other&quot; event in june so far, not a drastic recoding.</code></pre>
+#table(outreach_poly$activity, useNA = &quot;always&quot;) # see the results of the recoding
+# only 1 &quot;other&quot; event in june so far, not a drastic recoding.</code></pre>
 </div>
 </div>
 <div id="summarize-outreach-data" class="section level2">
 <h2>Summarize outreach data</h2>
 <div id="summarize-by-reporting-organization-and-tract" class="section level3">
 <h3>Summarize by Reporting Organization and Tract</h3>
-<p>Summarize for county-level events, by organizer and activity type.</p>
-<pre class="r"><code># county level events
+<p>Summarize for county-level events, by organizer and activity type. I only want activities that start or end in June.</p>
+<pre class="r"><code># county level events -- + everything in the county
 org_act_county &lt;- 
-outreach_poly %&gt;% 
-  filter(level==&quot;county&quot;) %&gt;% 
-  group_by(cbo_name, activity, level, month) %&gt;% 
+
+  outreach_poly %&gt;% 
+  
+  # filter only month start/end in June
+  filter((month ==&quot;6&quot; | month_end ==&quot;6&quot;)) %&gt;% 
+  group_by(cbo_name, activity) %&gt;% 
   summarize(impressions = sum(total_number_of_impressions, na.rm = T))
 
+
 head(org_act_county)</code></pre>
-<pre><code>## # A tibble: 6 x 5
-## # Groups:   cbo_name, activity, level [6]
-##   cbo_name                            activity      level month impressions
-##   &lt;chr&gt;                               &lt;chr&gt;         &lt;chr&gt; &lt;chr&gt;       &lt;int&gt;
-## 1 AltaMed Health Services Corp        Reactivate 8~ coun~ 06            883
-## 2 Antelope Valley Partners for Healt~ phone banking coun~ 06           1024
-## 3 API Forward Movement (Special Serv~ social media  coun~ 06             33
-## 4 California Black Womens Health Pro~ webinar       coun~ 06             25
-## 5 Community Partners fbo Latino Equa~ webinar       coun~ 06             12
-## 6 Council on American-Islamic Relati~ social media  coun~ 06            300</code></pre>
+<pre><code>## # A tibble: 6 x 3
+## # Groups:   cbo_name [6]
+##   cbo_name                                         activity     impressions
+##   &lt;chr&gt;                                            &lt;chr&gt;              &lt;int&gt;
+## 1 Antelope Valley Partners for Health (AVPH)       event                512
+## 2 API Forward Movement (Special Service for Group~ flyers                45
+## 3 Asian Youth Center                               flyers                98
+## 4 California Black Womens Health Project           event               1000
+## 5 Community Partners fbo ActiveSGV                 phone banki~         386
+## 6 Consejo de Federaciones Mexicanas en Norte Amer~ flyers              2000</code></pre>
+<pre class="r"><code># recode activity where needed
+# abbreviate this one
+org_act_county$activity[org_act_county$activity ==&quot;Case Managers explained the importance of the Census to clients in their case load and documented progress of Census Completion, language, and updated contact info. &quot;] &lt;- &quot;Case Managers explained the importance of the Census to clients&quot; 
+
+# review
+table(org_act_county$activity)</code></pre>
+<pre><code>## 
+##         advertising          canvassing          collateral 
+##                   1                   2                   1 
+##               event              flyers       phone banking 
+##                   7                   3                   3 
+## speaking engagement             webinar 
+##                   1                   1</code></pre>
+<pre class="r"><code># look for special characters
+table(org_act_county$cbo_name)</code></pre>
+<pre><code>## 
+##                 Antelope Valley Partners for Health (AVPH) 
+##                                                          1 
+##    API Forward Movement (Special Service for Groups, Inc.) 
+##                                                          1 
+##                                         Asian Youth Center 
+##                                                          1 
+##                     California Black Womens Health Project 
+##                                                          1 
+##                           Community Partners fbo ActiveSGV 
+##                                                          1 
+## Consejo de Federaciones Mexicanas en Norte America (COFEM) 
+##                                                          1 
+##                                                       CRLA 
+##                                                          1 
+##                                       Crystal Stairs, Inc. 
+##                                                          1 
+##                                               First 5 Yuba 
+##                                                          1 
+## Greater Long Beach Interfaith Community Organization (ICO) 
+##                                                          2 
+##          Korean American Federation of Los Angeles (KAFLA) 
+##                                                          1 
+##                   Koreatown Youth &amp; Community Center, Inc. 
+##                                                          1 
+##                                                    LA City 
+##                                                          2 
+##                                  Los Angeles County Census 
+##                                                          1 
+##                                            Para Los Ni?±os 
+##                                                          1 
+##                                         Pueblo y Salud Inc 
+##                                                          1 
+##                           South Central LA Regional Center 
+##                                                          1</code></pre>
+<pre class="r"><code>org_act_county$cbo_name[org_act_county$cbo_name ==&quot;Para Los Ni?±os&quot;] &lt;- &quot;Para Los Niños&quot;
+
+# export county-level outreach summary
+write.csv(org_act_county, paste0(root, &quot;outreach/county_act_org_outreach_0701.csv&quot;), row.names = FALSE)</code></pre>
 <p>Summarize for tract-specific events, by organizer and activity type.</p>
 <pre class="r"><code>org_act_tract &lt;- 
 outreach_poly %&gt;% 
@@ -508,14 +568,14 @@ outreach_poly %&gt;%
 head(org_act_tract)</code></pre>
 <pre><code>## # A tibble: 6 x 6
 ## # Groups:   GEOID, cbo_name, activity, level [6]
-##   GEOID      cbo_name                   activity    level month impressions
-##   &lt;chr&gt;      &lt;chr&gt;                      &lt;chr&gt;       &lt;chr&gt; &lt;chr&gt;       &lt;int&gt;
-## 1 060371021~ California Community Foun~ phone bank~ tract 06             33
-## 2 060371041~ California Community Foun~ phone bank~ tract 06            149
-## 3 060371041~ California Community Foun~ canvassing  tract 06              1
-## 4 060371041~ California Community Foun~ phone bank~ tract 06             62
-## 5 060371041~ Los Angeles County Census  phone bank~ tract 06             32
-## 6 060371042~ California Community Foun~ phone bank~ tract 06             31</code></pre>
+##   GEOID       cbo_name                 activity     level month impressions
+##   &lt;chr&gt;       &lt;chr&gt;                    &lt;chr&gt;        &lt;chr&gt; &lt;chr&gt;       &lt;int&gt;
+## 1 06037101210 California Calls Census  phone banki~ tract 2               1
+## 2 06037103102 California Calls Census  phone banki~ tract 2               1
+## 3 06037103400 California Calls Census  phone banki~ tract 2               1
+## 4 06037104108 Los Angeles County Cens~ phone banki~ tract 6              32
+## 5 06037104203 California Calls Census  phone banki~ tract 2               1
+## 6 06037104204 Pacoima Beautiful        event        tract 1             100</code></pre>
 <pre class="r"><code>org_act_tract_export &lt;- 
   org_act_tract %&gt;% 
  # join regions and neighborhood names to tracts
@@ -558,16 +618,16 @@ head(org_tracts_outreach_htc); dim(org_tracts_outreach_htc)</code></pre>
 ## # Groups:   GEOID [5]
 ##   GEOID cbo_name sum_impressions neighbrhd_name   htc region_name city 
 ##   &lt;chr&gt; &lt;chr&gt;              &lt;dbl&gt; &lt;chr&gt;          &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;
-## 1 0603~ Califor~             149 Pacoima           73 San Fernan~ Los ~
-## 2 0603~ Califor~              63 Pacoima           66 San Fernan~ Los ~
-## 3 0603~ Los Ang~              32 Pacoima           66 San Fernan~ Los ~
-## 4 0603~ Califor~              31 Pacoima           70 San Fernan~ Los ~
-## 5 0603~ Califor~              81 Pacoima           80 San Fernan~ Los ~
-## 6 0603~ Califor~               2 Pacoima           98 San Fernan~ Los ~
+## 1 0603~ Califor~               1 Tujunga           82 San Fernan~ Los ~
+## 2 0603~ Los Ang~              32 Pacoima           66 San Fernan~ Los ~
+## 3 0603~ Califor~               1 Pacoima           80 San Fernan~ Los ~
+## 4 0603~ Pueblo ~             131 Pacoima           61 San Fernan~ Los ~
+## 5 0603~ El Nido~             759 Pacoima           73 San Fernan~ Los ~
+## 6 0603~ Meet Ea~              24 Pacoima           73 San Fernan~ Los ~
 ## # ... with 6 more variables: NAME &lt;chr&gt;, total_pop_est &lt;int&gt;,
 ## #   total_pop_moe &lt;int&gt;, gq_pop_est &lt;int&gt;, gq_pop_moe &lt;int&gt;,
 ## #   gq_pop_pct &lt;dbl&gt;</code></pre>
-<pre><code>## [1] 996  13</code></pre>
+<pre><code>## [1] 1318   13</code></pre>
 <pre class="r"><code>#### Organizers in All tracts ##### 
 # join htc data to outreach activity data. 
 org_tracts_outreach &lt;- 
@@ -592,19 +652,19 @@ org_act_tract %&gt;%
 # review
 head(org_tracts_outreach); dim(org_tracts_outreach)</code></pre>
 <pre><code>## # A tibble: 6 x 13
-## # Groups:   GEOID [5]
+## # Groups:   GEOID [6]
 ##   GEOID cbo_name sum_impressions neighbrhd_name   htc region_name city 
 ##   &lt;chr&gt; &lt;chr&gt;              &lt;dbl&gt; &lt;chr&gt;          &lt;int&gt; &lt;chr&gt;       &lt;chr&gt;
-## 1 0603~ Califor~              33 Sun Valley        34 San Fernan~ Los ~
-## 2 0603~ Califor~             149 Pacoima           73 San Fernan~ Los ~
-## 3 0603~ Califor~              63 Pacoima           66 San Fernan~ Los ~
+## 1 0603~ Califor~               1 Tujunga           82 San Fernan~ Los ~
+## 2 0603~ Califor~               1 Sunland           33 San Fernan~ Los ~
+## 3 0603~ Califor~               1 Sunland           16 San Fernan~ Los ~
 ## 4 0603~ Los Ang~              32 Pacoima           66 San Fernan~ Los ~
-## 5 0603~ Califor~              31 Pacoima           70 San Fernan~ Los ~
-## 6 0603~ Califor~              81 Pacoima           80 San Fernan~ Los ~
+## 5 0603~ Califor~               1 Pacoima           80 San Fernan~ Los ~
+## 6 0603~ Pacoima~             100 Lake View Ter~    49 San Fernan~ Los ~
 ## # ... with 6 more variables: NAME &lt;chr&gt;, total_pop_est &lt;int&gt;,
 ## #   total_pop_moe &lt;int&gt;, gq_pop_est &lt;int&gt;, gq_pop_moe &lt;int&gt;,
 ## #   gq_pop_pct &lt;dbl&gt;</code></pre>
-<pre><code>## [1] 2351   13</code></pre>
+<pre><code>## [1] 2764   13</code></pre>
 <pre class="r"><code># export outreach data by reporting organization
 
 # for HTC tracts
