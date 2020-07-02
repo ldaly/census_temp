@@ -662,7 +662,7 @@ org_act_tract %&gt;%
   
   # join regions and neighborhood names to tracts
   full_join(tract_city_rel %&gt;% 
-              select(-NAME, -region, -GEOID_city), by=&quot;GEOID&quot;) %&gt;% 
+              select(-NAME, -GEOID_city), by=&quot;GEOID&quot;) %&gt;% 
    
    # join group quarters
   left_join(gq_tract, by=&quot;GEOID&quot;) %&gt;% 
@@ -707,7 +707,7 @@ st_write(tracts_outreach_htc_sp, driver=&quot;GeoJSON&quot;, paste0(root, &quot;
 <pre><code>## Deleting source `C:/Users/LDaly/Desktop/Census2020/data/outreach/outreach_htc_tracts_0701.geojson&#39; using driver `GeoJSON&#39;
 ## Writing layer `outreach_htc_tracts_0701&#39; to data source `C:/Users/LDaly/Desktop/Census2020/data/outreach/outreach_htc_tracts_0701.geojson&#39; using driver `GeoJSON&#39;
 ## features:       2344
-## fields:         23
+## fields:         24
 ## geometry type:  Multi Polygon</code></pre>
 </div>
 <div id="for-all-tracts" class="section level3">
