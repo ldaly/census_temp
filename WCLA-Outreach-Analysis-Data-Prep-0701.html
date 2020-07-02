@@ -457,7 +457,7 @@ table(outreach_poly$level, useNA = &quot;always&quot;)</code></pre>
 <pre class="r"><code>dim(outreach_poly)</code></pre>
 <pre><code>## [1] 6193   18</code></pre>
 <pre class="r"><code># remove weird tracts, or non-LA tracts
-outreach_poly &lt;- outreach_poly[(outreach_poly$tract %like% &quot;06037&quot; | outreach_poly$tract ==&quot;&quot;) &amp;  !is.na(outreach_poly$cbo_name), ]
+outreach_poly &lt;- outreach_poly[(outreach_poly$tract %like% &quot;06037&quot; | outreach_poly$tract ==&quot;&quot; | is.na(outreach_poly$tract)) &amp;  !is.na(outreach_poly$cbo_name), ]
 
 dim(outreach_poly)</code></pre>
 <pre><code>## [1] 6179   18</code></pre>
@@ -468,11 +468,7 @@ dim(outreach_poly)</code></pre>
 outreach_poly$activity &lt;- ifelse(outreach_poly$activity_type ==&quot;other&quot;, outreach_poly$activity_type_other, outreach_poly$activity_type)
 
 # remove underscores
-outreach_poly$activity &lt;- gsub(&quot;_&quot;, &quot; &quot;, outreach_poly$activity)
-
-# review
-#table(outreach_poly$activity, useNA = &quot;always&quot;) # see the results of the recoding
-# only 1 &quot;other&quot; event in june so far, not a drastic recoding.</code></pre>
+outreach_poly$activity &lt;- gsub(&quot;_&quot;, &quot; &quot;, outreach_poly$activity)</code></pre>
 </div>
 </div>
 <div id="summarize-outreach-data" class="section level2">
@@ -493,15 +489,15 @@ org_act_county &lt;-
 
 head(org_act_county)</code></pre>
 <pre><code>## # A tibble: 6 x 3
-## # Groups:   cbo_name [6]
-##   cbo_name                                         activity     impressions
-##   &lt;chr&gt;                                            &lt;chr&gt;              &lt;int&gt;
-## 1 Antelope Valley Partners for Health (AVPH)       event                512
-## 2 API Forward Movement (Special Service for Group~ flyers                45
-## 3 Asian Youth Center                               flyers                98
-## 4 California Black Womens Health Project           event               1000
-## 5 Community Partners fbo ActiveSGV                 phone banki~         386
-## 6 Consejo de Federaciones Mexicanas en Norte Amer~ flyers              2000</code></pre>
+## # Groups:   cbo_name [3]
+##   cbo_name                                   activity          impressions
+##   &lt;chr&gt;                                      &lt;chr&gt;                   &lt;int&gt;
+## 1 A New Way of Life Reentry Project (ANWOL)  social media              980
+## 2 AltaMed Health Services Corp               Reactivate 8 QACs         883
+## 3 AltaMed Health Services Corp               social media             2522
+## 4 Antelope Valley Partners for Health (AVPH) event                     512
+## 5 Antelope Valley Partners for Health (AVPH) phone banking            1024
+## 6 Antelope Valley Partners for Health (AVPH) social media             7095</code></pre>
 <pre class="r"><code># recode activity where needed
 # abbreviate this one
 org_act_county$activity[org_act_county$activity ==&quot;Case Managers explained the importance of the Census to clients in their case load and documented progress of Census Completion, language, and updated contact info. &quot;] &lt;- &quot;Case Managers explained the importance of the Census to clients&quot; 
@@ -509,49 +505,127 @@ org_act_county$activity[org_act_county$activity ==&quot;Case Managers explained 
 # review
 table(org_act_county$activity)</code></pre>
 <pre><code>## 
-##         advertising          canvassing          collateral 
-##                   1                   2                   1 
-##               event              flyers       phone banking 
-##                   7                   3                   3 
-## speaking engagement             webinar 
-##                   1                   1</code></pre>
+##                                                     advertising 
+##                                                               2 
+##                                                      canvassing 
+##                                                               2 
+## Case Managers explained the importance of the Census to clients 
+##                                                               1 
+##                                                      collateral 
+##                                                               2 
+##                                                           event 
+##                                                               7 
+##                                                          flyers 
+##                                                               3 
+##                                                         meeting 
+##                                                               1 
+##                                                   phone banking 
+##                                                              23 
+##                                               Reactivate 8 QACs 
+##                                                               1 
+##                                                    social media 
+##                                                              25 
+##                                             speaking engagement 
+##                                                               1 
+##                                                         webinar 
+##                                                               6</code></pre>
 <pre class="r"><code># look for special characters
 table(org_act_county$cbo_name)</code></pre>
 <pre><code>## 
-##                 Antelope Valley Partners for Health (AVPH) 
-##                                                          1 
-##    API Forward Movement (Special Service for Groups, Inc.) 
-##                                                          1 
-##                                         Asian Youth Center 
-##                                                          1 
-##                     California Black Womens Health Project 
-##                                                          1 
-##                           Community Partners fbo ActiveSGV 
-##                                                          1 
-## Consejo de Federaciones Mexicanas en Norte America (COFEM) 
-##                                                          1 
-##                                                       CRLA 
-##                                                          1 
-##                                       Crystal Stairs, Inc. 
-##                                                          1 
-##                                               First 5 Yuba 
-##                                                          1 
-## Greater Long Beach Interfaith Community Organization (ICO) 
-##                                                          2 
-##          Korean American Federation of Los Angeles (KAFLA) 
-##                                                          1 
-##                   Koreatown Youth &amp; Community Center, Inc. 
-##                                                          1 
-##                                                    LA City 
-##                                                          2 
-##                                  Los Angeles County Census 
-##                                                          1 
-##                                            Para Los Ni?±os 
-##                                                          1 
-##                                         Pueblo y Salud Inc 
-##                                                          1 
-##                           South Central LA Regional Center 
-##                                                          1</code></pre>
+##                                                             A New Way of Life Reentry Project (ANWOL) 
+##                                                                                                     1 
+##                                                                          AltaMed Health Services Corp 
+##                                                                                                     2 
+##                                                            Antelope Valley Partners for Health (AVPH) 
+##                                                                                                     3 
+##                                               API Forward Movement (Special Service for Groups, Inc.) 
+##                                                                                                     2 
+##                                                                                    Asian Youth Center 
+##                                                                                                     1 
+##                                                                           Building Skills Partnership 
+##                                                                                                     1 
+##                                                                California Black Womens Health Project 
+##                                                                                                     3 
+##                                                                    Central City Neighborhood Partners 
+##                                                                                                     2 
+##                                                                              Chinatown Service Center 
+##                                                                                                     2 
+##                                           Community Clinic Association of Los Angeles County (CCALAC) 
+##                                                                                                     1 
+##                                                                      Community Partners fbo ActiveSGV 
+##                                                                                                     2 
+##                                                       Community Partners fbo Latino Equality Alliance 
+##                                                                                                     2 
+##                                            Consejo de Federaciones Mexicanas en Norte America (COFEM) 
+##                                                                                                     4 
+##                                                      Council on American-Islamic Relations California 
+##                                                                                                     2 
+##                                                                                                  CRLA 
+##                                                                                                     1 
+##                                                                                  Crystal Stairs, Inc. 
+##                                                                                                     3 
+##                                                                                El Nido Family Centers 
+##                                                                                                     3 
+##                                                                         Equality California Institute 
+##                                                                                                     1 
+##                                                                                   Families In Schools 
+##                                                                                                     1 
+##                                                                                          First 5 Yuba 
+##                                                                                                     1 
+##                                            Greater Long Beach Interfaith Community Organization (ICO) 
+##                                                                                                     2 
+##                                                                            Human Services Association 
+##                                                                                                     1 
+##                                                               Instituto de Avance Integral Latino CDC 
+##                                                                                                     2 
+##                                                     Korean American Federation of Los Angeles (KAFLA) 
+##                                                                                                     1 
+## Korean Immigrant Workers Advocates of Southern California/ Koreatown Immigrant Worker Alliance (KIWA) 
+##                                                                                                     1 
+##                                                                                Korean Resource Center 
+##                                                                                                     2 
+##                                                              Koreatown Youth &amp; Community Center, Inc. 
+##                                                                                                     2 
+##                                                                                               LA City 
+##                                                                                                     2 
+##                                                                             Los Angeles County Census 
+##                                                                                                     1 
+##                                                                               Mar Vista Family Center 
+##                                                                                                     1 
+##                                                                           Meet Each Need with Dignity 
+##                                                                                                     1 
+##                                                                                NALEO Educational Fund 
+##                                                                                                     1 
+##                                                                                         ONEgeneration 
+##                                                                                                     2 
+##                                                                                       Para Los Ni?±os 
+##                                                                                                     2 
+##                                                                             Parent Engagement Academy 
+##                                                                                                     1 
+##                                                                                     Proyecto Pastoral 
+##                                                                                                     1 
+##                                                                                    Pueblo y Salud Inc 
+##                                                                                                     2 
+##                                                                                                 SALVA 
+##                                                                                                     1 
+##                                                                                    Self Help Graphics 
+##                                                                                                     1 
+##                                                                             South Asian Network (SAN) 
+##                                                                                                     1 
+##                                                                      South Central LA Regional Center 
+##                                                                                                     1 
+##                                                 Southern California Association of Non-Profit Housing 
+##                                                                                                     1 
+##                                         Strategic Concepts in Organizing and Policy Education (SCOPE) 
+##                                                                                                     1 
+##                                                                     Toberman Neighborhood Center Inc. 
+##                                                                                                     1 
+##                                   United Cambodian Community, Inc./Cambodian Complete Count Committee 
+##                                                                                                     1 
+##                                               University Auxiliary Services, Inc./Pat Brown Institute 
+##                                                                                                     2 
+##                                                                                   Vision Y Compromiso 
+##                                                                                                     1</code></pre>
 <pre class="r"><code>org_act_county$cbo_name[org_act_county$cbo_name ==&quot;Para Los Ni?±os&quot;] &lt;- &quot;Para Los Niños&quot;
 
 # export county-level outreach summary
