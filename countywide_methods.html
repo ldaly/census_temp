@@ -1617,7 +1617,7 @@ div.tocify {
 <a class="sourceLine" id="cb1-19" title="19"><span class="co"># set path</span></a>
 <a class="sourceLine" id="cb1-20" title="20">wcl_root &lt;-<span class="st"> &quot;C:/Users/LDaly/Desktop/Census2020/data/&quot;</span></a>
 <a class="sourceLine" id="cb1-21" title="21"></a>
-<a class="sourceLine" id="cb1-22" title="22"><span class="co">#### HARD CODED DATE ?</span></a>
+<a class="sourceLine" id="cb1-22" title="22"><span class="co">#### HARD CODED DATE ####</span></a>
 <a class="sourceLine" id="cb1-23" title="23"><span class="co"># load most recent standardized data for full county</span></a>
 <a class="sourceLine" id="cb1-24" title="24">dat &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="kw">paste0</span>(wcl_root, <span class="st">&quot;convener_reports/standardized_data_test2020-07-15.csv&quot;</span>), <span class="dt">data.table =</span> <span class="ot">FALSE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>, </a>
 <a class="sourceLine" id="cb1-25" title="25">             <span class="dt">colClasses =</span> <span class="kw">c</span>(<span class="st">&quot;GEOID&quot;</span>=<span class="st">&quot;character&quot;</span>))</a>
@@ -1628,19 +1628,19 @@ div.tocify {
 <a class="sourceLine" id="cb1-30" title="30">county_rate_cur &lt;-<span class="st"> </span><span class="kw">unique</span>(<span class="kw">subset</span>(dat, level <span class="op">==</span><span class="st">&quot;county&quot;</span>  <span class="op">&amp;</span><span class="st"> </span>subject <span class="op">==</span><span class="st"> &quot;Response Rate&quot;</span> <span class="op">&amp;</span><span class="st"> </span>value<span class="op">==</span><span class="st">&quot;2020&quot;</span>)<span class="op">$</span>estimate)</a>
 <a class="sourceLine" id="cb1-31" title="31"></a>
 <a class="sourceLine" id="cb1-32" title="32"></a>
-<a class="sourceLine" id="cb1-33" title="33"><span class="co">#### HARD CODED DATE</span></a>
-<a class="sourceLine" id="cb1-34" title="34"><span class="co"># load most recent response rate/tract compare data</span></a>
-<a class="sourceLine" id="cb1-35" title="35">change &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="kw">paste0</span>(wcl_root, <span class="st">&quot;self_response/selfresp_tract_converted_change_2020-07-15.csv&quot;</span>), <span class="dt">data.table =</span> <span class="ot">FALSE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>,</a>
-<a class="sourceLine" id="cb1-36" title="36">                <span class="dt">colClasses =</span> <span class="kw">c</span>(<span class="st">&quot;GEOID&quot;</span>=<span class="st">&quot;character&quot;</span>))</a>
-<a class="sourceLine" id="cb1-37" title="37"></a>
-<a class="sourceLine" id="cb1-38" title="38"><span class="co"># calc uncounted hh--if household count is 0 make NA, otherwise subtracted est. # of hh that responded from total households</span></a>
-<a class="sourceLine" id="cb1-39" title="39">change<span class="op">$</span>uncounted_hh =<span class="st">  </span><span class="kw">ifelse</span>(change<span class="op">$</span>housecur <span class="op">==</span><span class="dv">0</span>, <span class="ot">NA</span>, <span class="kw">round</span>(change<span class="op">$</span>housecur <span class="op">-</span><span class="st"> </span>change<span class="op">$</span>resp_house10,<span class="dv">0</span>))</a>
-<a class="sourceLine" id="cb1-40" title="40"></a>
-<a class="sourceLine" id="cb1-41" title="41">change<span class="op">$</span>region_name &lt;-<span class="st"> </span><span class="kw">ifelse</span>(change<span class="op">$</span>region_name<span class="op">==</span><span class="st">&quot;Northeast/Eastside/East LA&quot;</span>, <span class="st">&quot;Northeast-Eastside-East LA&quot;</span>, </a>
-<a class="sourceLine" id="cb1-42" title="42">                                     change<span class="op">$</span>region_name)</a>
-<a class="sourceLine" id="cb1-43" title="43"></a>
-<a class="sourceLine" id="cb1-44" title="44">data_date &lt;-<span class="st"> </span><span class="kw">unique</span>(change<span class="op">$</span>date.y)[<span class="dv">1</span>]</a>
-<a class="sourceLine" id="cb1-45" title="45"></a>
+<a class="sourceLine" id="cb1-33" title="33"><span class="co"># load most recent response rate/tract compare data</span></a>
+<a class="sourceLine" id="cb1-34" title="34">change &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="kw">paste0</span>(wcl_root, <span class="st">&quot;self_response/selfresp_tract_converted_change_2020-07-15.csv&quot;</span>), <span class="dt">data.table =</span> <span class="ot">FALSE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb1-35" title="35">                <span class="dt">colClasses =</span> <span class="kw">c</span>(<span class="st">&quot;GEOID&quot;</span>=<span class="st">&quot;character&quot;</span>))</a>
+<a class="sourceLine" id="cb1-36" title="36"></a>
+<a class="sourceLine" id="cb1-37" title="37"><span class="co"># calc uncounted hh--if household count is 0 make NA, otherwise subtracted est. # of hh that responded from total households</span></a>
+<a class="sourceLine" id="cb1-38" title="38">change<span class="op">$</span>uncounted_hh =<span class="st">  </span><span class="kw">ifelse</span>(change<span class="op">$</span>housecur <span class="op">==</span><span class="dv">0</span>, <span class="ot">NA</span>, <span class="kw">round</span>(change<span class="op">$</span>housecur <span class="op">-</span><span class="st"> </span>change<span class="op">$</span>resp_house10,<span class="dv">0</span>))</a>
+<a class="sourceLine" id="cb1-39" title="39"></a>
+<a class="sourceLine" id="cb1-40" title="40">change<span class="op">$</span>region_name &lt;-<span class="st"> </span><span class="kw">ifelse</span>(change<span class="op">$</span>region_name<span class="op">==</span><span class="st">&quot;Northeast/Eastside/East LA&quot;</span>, <span class="st">&quot;Northeast-Eastside-East LA&quot;</span>, </a>
+<a class="sourceLine" id="cb1-41" title="41">                                     change<span class="op">$</span>region_name)</a>
+<a class="sourceLine" id="cb1-42" title="42"></a>
+<a class="sourceLine" id="cb1-43" title="43">data_date &lt;-<span class="st"> </span><span class="kw">unique</span>(change<span class="op">$</span>date.y)[<span class="dv">1</span>]</a>
+<a class="sourceLine" id="cb1-44" title="44"></a>
+<a class="sourceLine" id="cb1-45" title="45"><span class="co">#### DATA THAT DOESN&#39;T CHANGE ####</span></a>
 <a class="sourceLine" id="cb1-46" title="46"><span class="co"># load demographic data</span></a>
 <a class="sourceLine" id="cb1-47" title="47">demog &lt;-<span class="st">  </span><span class="kw">fread</span>(<span class="kw">paste0</span>(wcl_root, <span class="st">&quot;convener_reports/Demographic_Language_AllLevels.csv&quot;</span>), <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>, <span class="dt">data.table =</span> <span class="ot">FALSE</span>,</a>
 <a class="sourceLine" id="cb1-48" title="48">                <span class="dt">colClasses =</span> <span class="kw">c</span>(<span class="st">&quot;GEOID&quot;</span>=<span class="st">&quot;character&quot;</span>))</a>
@@ -1953,12 +1953,12 @@ div.tocify {
 ## 5        663 0.170231264 1133.44075 0.269902728 0.54271560    101400
 ## 6        663 0.170231264 1133.44075 0.269902728 0.54271560    102103
 ##   resp2020_converted.x     date.x neighbrhd_name    NAME htc region
-## 1                0.567 2020-06-25        Tujunga 1011.10  48      6
-## 2                0.614 2020-06-25        Tujunga 1011.22  13      6
-## 3                0.520 2020-06-25        Tujunga 1013.00  15      6
-## 4                0.396 2020-06-25        Tujunga 1014.00  27      6
-## 5                0.396 2020-06-25        Tujunga 1014.00  27      6
-## 6                0.626 2020-06-25   Shadow Hills 1021.03  24      6
+## 1                0.568 2020-07-01        Tujunga 1011.10  48      6
+## 2                0.615 2020-07-01        Tujunga 1011.22  13      6
+## 3                0.521 2020-07-01        Tujunga 1013.00  15      6
+## 4                0.397 2020-07-01        Tujunga 1014.00  27      6
+## 5                0.397 2020-07-01        Tujunga 1014.00  27      6
+## 6                0.627 2020-07-01   Shadow Hills 1021.03  24      6
 ##           region_name GEOID_city        city resp_house10 resp10_house10
 ## 1 San Fernando Valley     644000 Los Angeles      909.720       1209.417
 ## 2 San Fernando Valley     644000 Los Angeles      774.952       1017.600
@@ -1974,12 +1974,12 @@ div.tocify {
 ## 5     1473    1498                0.397 2020-07-15              0.750
 ## 6      696     630                0.629 2020-07-15              0.719
 ##   resp10_20_diff_converted  prc_change difference gq_pop_est gq_pop_pct
-## 1                   -0.167 0.005291005      0.003         95  2.2021326
-## 2                   -0.151 0.004885993      0.003          5  0.1543686
-## 3                   -0.250 0.003846154      0.002         47  1.0937864
-## 4                   -0.353 0.002525253      0.001         24  0.6232147
-## 5                   -0.353 0.002525253      0.001         24  0.6232147
-## 6                   -0.090 0.004792332      0.003          0  0.0000000
+## 1                   -0.167 0.003521127      0.002         95  2.2021326
+## 2                   -0.151 0.003252033      0.002          5  0.1543686
+## 3                   -0.250 0.001919386      0.001         47  1.0937864
+## 4                   -0.353 0.000000000      0.000         24  0.6232147
+## 5                   -0.353 0.000000000      0.000         24  0.6232147
+## 6                   -0.090 0.003189793      0.002          0  0.0000000
 ##   uncounted_hh
 ## 1          686
 ## 2          481
@@ -2019,15 +2019,15 @@ div.tocify {
 <pre><code>##           GEOID value        subject estimate      prc median_est
 ## 814 06037219800 Black Race-Ethnicity      546 0.194306        150
 ##     median_prc mean_est  mean_prc  quintile TRACTCE10 resp2020_converted.x
-## 814 0.03771088 351.2306 0.0802483 0.1115769    219800                0.473
+## 814 0.03771088 351.2306 0.0802483 0.1115769    219800                0.475
 ##         date.x neighbrhd_name NAME htc region region_name GEOID_city
-## 814 2020-06-25     West Adams 2198  79     10    South LA     644000
+## 814 2020-07-01     West Adams 2198  79     10    South LA     644000
 ##            city resp_house10 resp10_house10 housecur house10
 ## 814 Los Angeles      473.731         628.32      989     952
 ##     resp2020_converted.y     date.y resp2010_converted
 ## 814                0.479 2020-07-15               0.66
-##     resp10_20_diff_converted prc_change difference gq_pop_est gq_pop_pct
-## 814                   -0.181 0.01268499      0.006          5  0.1779359
+##     resp10_20_diff_converted  prc_change difference gq_pop_est gq_pop_pct
+## 814                   -0.181 0.008421053      0.004          5  0.1779359
 ##     uncounted_hh
 ## 814          515</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co"># in this tract in West Adams/South LA, there are higher than average Black,Latinx, foreign born and LEP pop shares</span></a>
