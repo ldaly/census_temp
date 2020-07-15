@@ -1440,7 +1440,7 @@ summary {
 
 
 
-<!---- tabsets ---->
+<!-- tabsets -->
 
 <style type="text/css">
 .tabset-dropdown > .nav-tabs {
@@ -1497,7 +1497,7 @@ summary {
 }
 </style>
 
-<!---- code folding ---->
+<!-- code folding -->
 
 
 
@@ -1573,7 +1573,7 @@ div.tocify {
 <div class="container-fluid main-container">
 
 
-<!---- setup 3col/9col grid for toc_float and main content  ---->
+<!-- setup 3col/9col grid for toc_float and main content  -->
 <div class="row-fluid">
 <div class="col-xs-12 col-sm-4 col-md-3">
 <div id="TOC" class="tocify">
@@ -1619,7 +1619,7 @@ div.tocify {
 <a class="sourceLine" id="cb1-21" title="21"></a>
 <a class="sourceLine" id="cb1-22" title="22"><span class="co">#### HARD CODED DATE ?</span></a>
 <a class="sourceLine" id="cb1-23" title="23"><span class="co"># load most recent standardized data for full county</span></a>
-<a class="sourceLine" id="cb1-24" title="24">dat &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="kw">paste0</span>(wcl_root, <span class="st">&quot;convener_reports/standardized_data_test2020-06-18.csv&quot;</span>), <span class="dt">data.table =</span> <span class="ot">FALSE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>, </a>
+<a class="sourceLine" id="cb1-24" title="24">dat &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="kw">paste0</span>(wcl_root, <span class="st">&quot;convener_reports/standardized_data_test2020-07-15.csv&quot;</span>), <span class="dt">data.table =</span> <span class="ot">FALSE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>, </a>
 <a class="sourceLine" id="cb1-25" title="25">             <span class="dt">colClasses =</span> <span class="kw">c</span>(<span class="st">&quot;GEOID&quot;</span>=<span class="st">&quot;character&quot;</span>))</a>
 <a class="sourceLine" id="cb1-26" title="26"></a>
 <a class="sourceLine" id="cb1-27" title="27"><span class="co"># set up object for state rate</span></a>
@@ -1630,7 +1630,7 @@ div.tocify {
 <a class="sourceLine" id="cb1-32" title="32"></a>
 <a class="sourceLine" id="cb1-33" title="33"><span class="co">#### HARD CODED DATE</span></a>
 <a class="sourceLine" id="cb1-34" title="34"><span class="co"># load most recent response rate/tract compare data</span></a>
-<a class="sourceLine" id="cb1-35" title="35">change &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="kw">paste0</span>(wcl_root, <span class="st">&quot;self_response/selfresp_tract_converted_change_2020-06-18.csv&quot;</span>), <span class="dt">data.table =</span> <span class="ot">FALSE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb1-35" title="35">change &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="kw">paste0</span>(wcl_root, <span class="st">&quot;self_response/selfresp_tract_converted_change_2020-07-15.csv&quot;</span>), <span class="dt">data.table =</span> <span class="ot">FALSE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>,</a>
 <a class="sourceLine" id="cb1-36" title="36">                <span class="dt">colClasses =</span> <span class="kw">c</span>(<span class="st">&quot;GEOID&quot;</span>=<span class="st">&quot;character&quot;</span>))</a>
 <a class="sourceLine" id="cb1-37" title="37"></a>
 <a class="sourceLine" id="cb1-38" title="38"><span class="co"># calc uncounted hh--if household count is 0 make NA, otherwise subtracted est. # of hh that responded from total households</span></a>
@@ -1657,8 +1657,8 @@ div.tocify {
 <a class="sourceLine" id="cb1-59" title="59"></a>
 <a class="sourceLine" id="cb1-60" title="60"><span class="co"># query only LA Co, keep only columns with tract id and HTC score &amp; top 3 attributes contributing to HTC score</span></a>
 <a class="sourceLine" id="cb1-61" title="61">htc &lt;-<span class="st"> </span>htc[htc<span class="op">$</span>county_fip<span class="op">==</span><span class="st">&quot;037&quot;</span>, <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">17</span>, <span class="dv">41</span><span class="op">:</span><span class="dv">43</span>)]</a></code></pre></div>
-<div id="data-as-of-2020-06-18" class="section level4">
-<h4>Data as of 2020-06-18</h4>
+<div id="data-as-of-2020-07-15" class="section level4">
+<h4>Data as of 2020-07-15</h4>
 </div>
 <div id="summarize-htc-by-neighborhood" class="section level2">
 <h2>Summarize HTC by neighborhood</h2>
@@ -1746,12 +1746,12 @@ div.tocify {
 ## # Groups:   region_name [4]
 ##   region_name NAME  `Response Rate` `Uncounted Hous~ mean_htc count_htc
 ##   &lt;chr&gt;       &lt;chr&gt;           &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;
-## 1 Santa Clar~ Nort~            30                400     30          NA
-## 2 South LA    Univ~            33.3             3762     96.7         7
-## 3 Central LA  Down~            35              18400     91.6        13
-## 4 West LA     Mali~            35.6             3715     20          NA
-## 5 South LA    Hist~            35.9             7161     98.8        12
-## 6 West LA     Cent~            37.1              865     45          NA
+## 1 Santa Clar~ Nort~            31.6              391     30          NA
+## 2 South LA    Univ~            34.1             3717     96.7         7
+## 3 Central LA  Down~            35.6            18210     91.6        13
+## 4 West LA     Mali~            36               3692     20          NA
+## 5 South LA    Hist~            36.8             7058     98.8        12
+## 6 West LA     Cent~            37.7              857     45          NA
 ## # ... with 5 more variables: rank_resp &lt;dbl&gt;, rank_htc &lt;dbl&gt;,
 ## #   rank_cnthtc &lt;dbl&gt;, rank_uncthh &lt;int&gt;, rank_tot &lt;dbl&gt;</code></pre>
 </div>
@@ -1783,12 +1783,12 @@ div.tocify {
 ## # Groups:   region_name [3]
 ##   region_name NAME  `Response Rate` `Uncounted Hous~ mean_htc count_htc
 ##   &lt;chr&gt;       &lt;chr&gt;           &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;
-## 1 Central LA  Down~            35              18400     91.6        13
-## 2 South LA    Hist~            35.9             7161     98.8        12
-## 3 South LA    Cent~            39.4             5975     90.7        10
-## 4 Central LA  Pico~            39.8             8327    103.         14
-## 5 Central LA  Holl~            43.2            21796     81.9        21
-## 6 West LA     West~            43.4            10546     54           5
+## 1 Central LA  Down~            35.6            18210     91.6        13
+## 2 South LA    Hist~            36.8             7058     98.8        12
+## 3 South LA    Cent~            40.5             5859     90.7        10
+## 4 Central LA  Pico~            40.6             8219    103.         14
+## 5 Central LA  Holl~            43.9            21541     81.9        21
+## 6 West LA     West~            44.1            10404     54           5
 ## # ... with 5 more variables: rank_resp &lt;dbl&gt;, rank_htc &lt;dbl&gt;,
 ## #   rank_cnthtc &lt;dbl&gt;, rank_uncthh &lt;int&gt;, rank_tot &lt;dbl&gt;</code></pre>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># code broader neighborhood groups</span></a>
@@ -1863,10 +1863,8 @@ div.tocify {
 <h2>Where do different demographic groups live?</h2>
 <p>My goal here is to say, we are at risk for undercounting the Black population, Latinx, foreign born, LEP, etc….</p>
 <ul>
-<li>so look at tracts where the Black population exceeds tract average, and then calculate the response rate for those tracts. Repeat for other demographics.</li>
+<li>so look at tracts where the Black population exceeds the top population quintile for tracts countywide, and then calculate the response rate for those tracts. Repeat for other demographics.</li>
 </ul>
-<div id="set-population-threshold-to-above-average-population" class="section level3">
-<h3>Set Population Threshold to Above Average Population</h3>
 <div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb12-1" title="1"><span class="co"># get the median and mean for various demographics</span></a>
 <a class="sourceLine" id="cb12-2" title="2"><span class="co"># for race and foreign born</span></a>
 <a class="sourceLine" id="cb12-3" title="3">countywide_stats &lt;-<span class="st"> </span></a>
@@ -1916,119 +1914,30 @@ div.tocify {
 ##   subject            value median_est median_prc mean_est mean_prc quintile
 ##   &lt;chr&gt;              &lt;chr&gt;      &lt;dbl&gt;      &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
 ## 1 Language other th~ LEP         878.      0.234     966.    0.240    0.373</code></pre>
-<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="co"># going to go with the average tract values because it is a higher threshold. </span></a>
-<a class="sourceLine" id="cb16-2" title="2"></a>
-<a class="sourceLine" id="cb16-3" title="3"></a>
-<a class="sourceLine" id="cb16-4" title="4"><span class="co"># set up demographic data -- query only race/eth records, and join the countywide stats</span></a>
-<a class="sourceLine" id="cb16-5" title="5">race_df &lt;-<span class="st"> </span></a>
-<a class="sourceLine" id="cb16-6" title="6">demog <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-7" title="7"><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span>subject <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Household Count&quot;</span>, <span class="st">&quot;Language other than English&quot;</span>) <span class="op">&amp;</span><span class="st"> </span>value <span class="op">!=</span><span class="st"> &quot;Total&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb16-8" title="8"><span class="st">  </span><span class="kw">select</span>(GEOID, value, subject, estimate, prc) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-9" title="9"><span class="st">  </span></a>
-<a class="sourceLine" id="cb16-10" title="10"><span class="st">  </span><span class="co"># join the countywide stats by race</span></a>
-<a class="sourceLine" id="cb16-11" title="11"><span class="st">  </span><span class="kw">left_join</span>(countywide_stats, </a>
-<a class="sourceLine" id="cb16-12" title="12">            <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;subject&quot;</span>, <span class="st">&quot;value&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-13" title="13"><span class="st">  </span></a>
-<a class="sourceLine" id="cb16-14" title="14"><span class="st">  </span><span class="co"># query only tracts where the % for that race is greater than its mean </span></a>
-<a class="sourceLine" id="cb16-15" title="15"><span class="st">  </span><span class="kw">filter</span>(prc <span class="op">&gt;</span><span class="st"> </span>mean_prc) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-16" title="16"><span class="st">  </span></a>
-<a class="sourceLine" id="cb16-17" title="17"><span class="st">   </span><span class="co"># now join response rates</span></a>
-<a class="sourceLine" id="cb16-18" title="18"><span class="st">  </span><span class="kw">left_join</span>(change, <span class="dt">by=</span><span class="st">&quot;GEOID&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb16-19" title="19"><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-20" title="20"><span class="st">  </span><span class="co"># exclude high % group quarters tractss</span></a>
-<a class="sourceLine" id="cb16-21" title="21"><span class="st">  </span><span class="kw">filter</span>( gq_pop_pct <span class="op">&lt;</span><span class="st"> </span><span class="fl">50.0</span>)</a>
-<a class="sourceLine" id="cb16-22" title="22">  </a>
-<a class="sourceLine" id="cb16-23" title="23"></a>
-<a class="sourceLine" id="cb16-24" title="24"></a>
-<a class="sourceLine" id="cb16-25" title="25"></a>
-<a class="sourceLine" id="cb16-26" title="26"><span class="co">### set up lep demog -- summarize to get lep by tract then select only tracts with higher than average lep</span></a>
-<a class="sourceLine" id="cb16-27" title="27">lep_df &lt;-<span class="st"> </span></a>
-<a class="sourceLine" id="cb16-28" title="28">demog <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-29" title="29"><span class="st">  </span><span class="kw">filter</span>( subject <span class="op">==</span><span class="st">&quot;Language other than English&quot;</span> <span class="op">&amp;</span><span class="st"> </span>value <span class="op">!=</span><span class="st">&quot;Speak only English&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-30" title="30"><span class="st">  </span><span class="kw">group_by</span>(GEOID, subject) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-31" title="31"><span class="st"> </span><span class="kw">summarize</span>(<span class="dt">estimate =</span> <span class="kw">sum</span>(estimate, <span class="dt">na.rm =</span> T),</a>
-<a class="sourceLine" id="cb16-32" title="32">            <span class="dt">summary_est =</span> <span class="kw">mean</span>(summary_est, <span class="dt">na.rm =</span> T),</a>
-<a class="sourceLine" id="cb16-33" title="33">           <span class="dt">prc =</span> estimate<span class="op">/</span>summary_est) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-34" title="34"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">value =</span> <span class="st">&quot;LEP&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-35" title="35"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>summary_est) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-36" title="36"><span class="st">  </span><span class="co"># join the lep countywide stats</span></a>
-<a class="sourceLine" id="cb16-37" title="37"><span class="st">  </span><span class="kw">left_join</span>(countywide_lep_stats) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-38" title="38"></a>
-<a class="sourceLine" id="cb16-39" title="39"><span class="st">  </span><span class="co"># query only tracts where the % for that tract lep is greater than its mean </span></a>
-<a class="sourceLine" id="cb16-40" title="40"><span class="st">  </span><span class="kw">filter</span>(prc <span class="op">&gt;</span><span class="st"> </span>mean_prc) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-41" title="41"><span class="st">  </span></a>
-<a class="sourceLine" id="cb16-42" title="42"><span class="st">   </span><span class="co"># now join response rates</span></a>
-<a class="sourceLine" id="cb16-43" title="43"><span class="st">  </span><span class="kw">left_join</span>(change, <span class="dt">by=</span><span class="st">&quot;GEOID&quot;</span>)  <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb16-44" title="44"><span class="st"> </span></a>
-<a class="sourceLine" id="cb16-45" title="45"><span class="st">  </span><span class="co"># exclude high % group quarters tractss</span></a>
-<a class="sourceLine" id="cb16-46" title="46"><span class="st">  </span><span class="kw">filter</span>( gq_pop_pct <span class="op">&lt;</span><span class="st"> </span><span class="fl">50.0</span>) </a>
-<a class="sourceLine" id="cb16-47" title="47"></a>
-<a class="sourceLine" id="cb16-48" title="48"> </a>
-<a class="sourceLine" id="cb16-49" title="49"></a>
-<a class="sourceLine" id="cb16-50" title="50"><span class="co">## combine lep and race to get one long df</span></a>
-<a class="sourceLine" id="cb16-51" title="51">race_df &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(race_df, lep_df)</a>
-<a class="sourceLine" id="cb16-52" title="52"></a>
-<a class="sourceLine" id="cb16-53" title="53"><span class="co"># Select random tract for example</span></a>
-<a class="sourceLine" id="cb16-54" title="54"><span class="kw">subset</span>(race_df, GEOID <span class="op">==</span><span class="st">&quot;06037106114&quot;</span>)</a></code></pre></div>
-<pre><code>##            GEOID  value                     subject estimate        prc
-## 81   06037106114   AIAN              Race-Ethnicity       71 0.01107644
-## 82   06037106114 Latinx              Race-Ethnicity     5487 0.85600624
-## 6757 06037106114    LEP Language other than English     1610 0.27893278
-##      median_est  median_prc   mean_est    mean_prc   quintile TRACTCE10
-## 81         10.0 0.002469813   30.06266 0.007736351 0.01086444    106114
-## 82       1823.5 0.459578893 2085.93478 0.479577260 0.77825557    106114
-## 6757      877.5 0.234063745  966.16880 0.240408875 0.37295923    106114
-##      resp2020_converted.x     date.x neighbrhd_name    NAME htc region
-## 81                  0.519 2020-06-03         Sylmar 1061.14  69      6
-## 82                  0.519 2020-06-03         Sylmar 1061.14  69      6
-## 6757                0.519 2020-06-03         Sylmar 1061.14  69      6
-##              region_name GEOID_city        city resp_house10
-## 81   San Fernando Valley     644000 Los Angeles      838.984
-## 82   San Fernando Valley     644000 Los Angeles      838.984
-## 6757 San Fernando Valley     644000 Los Angeles      838.984
-##      resp10_house10 housecur house10 resp2020_converted.y     date.y
-## 81             1047     1592    1500                0.527 2020-06-18
-## 82             1047     1592    1500                0.527 2020-06-18
-## 6757           1047     1592    1500                0.527 2020-06-18
-##      resp2010_converted resp10_20_diff_converted prc_change difference
-## 81                0.698                   -0.171 0.01541426      0.008
-## 82                0.698                   -0.171 0.01541426      0.008
-## 6757              0.698                   -0.171 0.01541426      0.008
-##      gq_pop_est gq_pop_pct uncounted_hh
-## 81            6 0.09360374          753
-## 82            6 0.09360374          753
-## 6757          6 0.09360374          753</code></pre>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb18-1" title="1"><span class="co"># in this tract in SFV in Sylmar, the share AIAN and Latinx is higher than average. The share LEP is also higher than average</span></a>
-<a class="sourceLine" id="cb18-2" title="2"> </a>
-<a class="sourceLine" id="cb18-3" title="3"><span class="co">### Export the combined race/fb/lep demographic tract table -- WHERE TRACTS HAVE HIGHER THAN AVERAGE DEMOGRAHPICS</span></a>
-<a class="sourceLine" id="cb18-4" title="4"><span class="kw">write.csv</span>(race_df, <span class="kw">paste0</span>(wcl_root, <span class="st">&quot;Countywide Town Hall Reports/higher_than_avg_demographics_tract_refresh.csv&quot;</span>), <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb18-5" title="5"></a>
-<a class="sourceLine" id="cb18-6" title="6"><span class="co">### Export the combined race/fb/lep demographic tract table -- WHERE TRACTS HAVE HIGHER THAN AVERAGE DEMOGRAHPICS</span></a>
-<a class="sourceLine" id="cb18-7" title="7"><span class="kw">write.csv</span>(race_df, <span class="kw">paste0</span>(wcl_root, <span class="st">&quot;Countywide Town Hall Reports/higher_than_avg_demographics_tract_&quot;</span>, data_date, <span class="st">&quot;.csv&quot;</span>), <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
-</div>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb16-1" title="1"><span class="co"># going to go with the average tract values because it is a higher threshold. </span></a></code></pre></div>
 <div id="set-population-threshold-to-highest-quintile" class="section level3">
 <h3>Set Population Threshold to Highest Quintile</h3>
-<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="co">### Top Quintile Demog DF #####</span></a>
-<a class="sourceLine" id="cb19-2" title="2"><span class="co"># set up demographic data -- query only race/eth records, and join the countywide stats</span></a>
-<a class="sourceLine" id="cb19-3" title="3">race_quint &lt;-<span class="st"> </span></a>
-<a class="sourceLine" id="cb19-4" title="4">demog <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb19-5" title="5"><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span>subject <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Household Count&quot;</span>, <span class="st">&quot;Language other than English&quot;</span>) <span class="op">&amp;</span><span class="st"> </span>value <span class="op">!=</span><span class="st"> &quot;Total&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb19-6" title="6"><span class="st">  </span><span class="kw">select</span>(GEOID, value, subject, estimate, prc) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb19-7" title="7"><span class="st">  </span></a>
-<a class="sourceLine" id="cb19-8" title="8"><span class="st">  </span><span class="co"># join the countywide stats by race</span></a>
-<a class="sourceLine" id="cb19-9" title="9"><span class="st">  </span><span class="kw">left_join</span>(countywide_stats, </a>
-<a class="sourceLine" id="cb19-10" title="10">            <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;subject&quot;</span>, <span class="st">&quot;value&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb19-11" title="11"><span class="st">  </span></a>
-<a class="sourceLine" id="cb19-12" title="12"><span class="st">  </span><span class="co"># query only tracts where the % for that race is greater than its mean </span></a>
-<a class="sourceLine" id="cb19-13" title="13"><span class="st">  </span><span class="kw">filter</span>(prc <span class="op">&gt;=</span><span class="st"> </span>quintile) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb19-14" title="14"><span class="st">  </span></a>
-<a class="sourceLine" id="cb19-15" title="15"><span class="st">   </span><span class="co"># now join response rates</span></a>
-<a class="sourceLine" id="cb19-16" title="16"><span class="st">  </span><span class="kw">left_join</span>(change, <span class="dt">by=</span><span class="st">&quot;GEOID&quot;</span>) <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb19-17" title="17"><span class="st"> </span></a>
-<a class="sourceLine" id="cb19-18" title="18"><span class="st">  </span><span class="co"># exclude high % group quarters tractss</span></a>
-<a class="sourceLine" id="cb19-19" title="19"><span class="st">  </span><span class="kw">filter</span>( gq_pop_pct <span class="op">&lt;</span><span class="st"> </span><span class="fl">50.0</span>)</a>
-<a class="sourceLine" id="cb19-20" title="20">  </a>
-<a class="sourceLine" id="cb19-21" title="21"><span class="kw">head</span>(race_quint)</a></code></pre></div>
+<div class="sourceCode" id="cb17"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb17-1" title="1"><span class="co">### Top Quintile Demog DF #####</span></a>
+<a class="sourceLine" id="cb17-2" title="2"><span class="co"># set up demographic data -- query only race/eth records, and join the countywide stats</span></a>
+<a class="sourceLine" id="cb17-3" title="3">race_quint &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb17-4" title="4">demog <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-5" title="5"><span class="st">  </span><span class="kw">filter</span>(<span class="op">!</span>subject <span class="op">%in%</span><span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;Household Count&quot;</span>, <span class="st">&quot;Language other than English&quot;</span>) <span class="op">&amp;</span><span class="st"> </span>value <span class="op">!=</span><span class="st"> &quot;Total&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb17-6" title="6"><span class="st">  </span><span class="kw">select</span>(GEOID, value, subject, estimate, prc) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-7" title="7"><span class="st">  </span></a>
+<a class="sourceLine" id="cb17-8" title="8"><span class="st">  </span><span class="co"># join the countywide stats by race</span></a>
+<a class="sourceLine" id="cb17-9" title="9"><span class="st">  </span><span class="kw">left_join</span>(countywide_stats, </a>
+<a class="sourceLine" id="cb17-10" title="10">            <span class="dt">by =</span> <span class="kw">c</span>(<span class="st">&quot;subject&quot;</span>, <span class="st">&quot;value&quot;</span>)) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-11" title="11"><span class="st">  </span></a>
+<a class="sourceLine" id="cb17-12" title="12"><span class="st">  </span><span class="co"># query only tracts where the % for that race is greater than its mean </span></a>
+<a class="sourceLine" id="cb17-13" title="13"><span class="st">  </span><span class="kw">filter</span>(prc <span class="op">&gt;=</span><span class="st"> </span>quintile) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-14" title="14"><span class="st">  </span></a>
+<a class="sourceLine" id="cb17-15" title="15"><span class="st">   </span><span class="co"># now join response rates</span></a>
+<a class="sourceLine" id="cb17-16" title="16"><span class="st">  </span><span class="kw">left_join</span>(change, <span class="dt">by=</span><span class="st">&quot;GEOID&quot;</span>) <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb17-17" title="17"><span class="st"> </span></a>
+<a class="sourceLine" id="cb17-18" title="18"><span class="st">  </span><span class="co"># exclude high % group quarters tractss</span></a>
+<a class="sourceLine" id="cb17-19" title="19"><span class="st">  </span><span class="kw">filter</span>( gq_pop_pct <span class="op">&lt;</span><span class="st"> </span><span class="fl">50.0</span>)</a>
+<a class="sourceLine" id="cb17-20" title="20">  </a>
+<a class="sourceLine" id="cb17-21" title="21"><span class="kw">head</span>(race_quint)</a></code></pre></div>
 <pre><code>##         GEOID            value        subject estimate        prc
 ## 1 06037101110 White non-Latinx Race-Ethnicity     2516 0.58321743
 ## 2 06037101122 White non-Latinx Race-Ethnicity     2755 0.85057116
@@ -2044,90 +1953,90 @@ div.tocify {
 ## 5        663 0.170231264 1133.44075 0.269902728 0.54271560    101400
 ## 6        663 0.170231264 1133.44075 0.269902728 0.54271560    102103
 ##   resp2020_converted.x     date.x neighbrhd_name    NAME htc region
-## 1                0.562 2020-06-03        Tujunga 1011.10  48      6
-## 2                0.607 2020-06-03        Tujunga 1011.22  13      6
-## 3                0.517 2020-06-03        Tujunga 1013.00  15      6
-## 4                0.395 2020-06-03        Tujunga 1014.00  27      6
-## 5                0.395 2020-06-03        Tujunga 1014.00  27      6
-## 6                0.622 2020-06-03   Shadow Hills 1021.03  24      6
+## 1                0.567 2020-06-25        Tujunga 1011.10  48      6
+## 2                0.614 2020-06-25        Tujunga 1011.22  13      6
+## 3                0.520 2020-06-25        Tujunga 1013.00  15      6
+## 4                0.396 2020-06-25        Tujunga 1014.00  27      6
+## 5                0.396 2020-06-25        Tujunga 1014.00  27      6
+## 6                0.626 2020-06-25   Shadow Hills 1021.03  24      6
 ##           region_name GEOID_city        city resp_house10 resp10_house10
-## 1 San Fernando Valley     644000 Los Angeles      903.336       1209.417
-## 2 San Fernando Valley     644000 Los Angeles      771.184       1017.600
-## 3 San Fernando Valley     644000 Los Angeles      746.200       1190.424
-## 4 San Fernando Valley     644000 Los Angeles      583.308       1123.500
-## 5 San Fernando Valley     644000 Los Angeles      583.308       1123.500
-## 6 San Fernando Valley     644000 Los Angeles      435.696        452.970
+## 1 San Fernando Valley     644000 Los Angeles      909.720       1209.417
+## 2 San Fernando Valley     644000 Los Angeles      774.952       1017.600
+## 3 San Fernando Valley     644000 Los Angeles      749.070       1190.424
+## 4 San Fernando Valley     644000 Los Angeles      584.781       1123.500
+## 5 San Fernando Valley     644000 Los Angeles      584.781       1123.500
+## 6 San Fernando Valley     644000 Los Angeles      437.784        452.970
 ##   housecur house10 resp2020_converted.y     date.y resp2010_converted
-## 1     1596    1641                0.566 2020-06-18              0.737
-## 2     1256    1325                0.614 2020-06-18              0.768
-## 3     1435    1542                0.520 2020-06-18              0.772
-## 4     1473    1498                0.396 2020-06-18              0.750
-## 5     1473    1498                0.396 2020-06-18              0.750
-## 6      696     630                0.626 2020-06-18              0.719
+## 1     1596    1641                0.570 2020-07-15              0.737
+## 2     1256    1325                0.617 2020-07-15              0.768
+## 3     1435    1542                0.522 2020-07-15              0.772
+## 4     1473    1498                0.397 2020-07-15              0.750
+## 5     1473    1498                0.397 2020-07-15              0.750
+## 6      696     630                0.629 2020-07-15              0.719
 ##   resp10_20_diff_converted  prc_change difference gq_pop_est gq_pop_pct
-## 1                   -0.171 0.007117438      0.004         95  2.2021326
-## 2                   -0.154 0.011532125      0.007          5  0.1543686
-## 3                   -0.252 0.005802708      0.003         47  1.0937864
-## 4                   -0.354 0.002531646      0.001         24  0.6232147
-## 5                   -0.354 0.002531646      0.001         24  0.6232147
-## 6                   -0.093 0.006430868      0.004          0  0.0000000
+## 1                   -0.167 0.005291005      0.003         95  2.2021326
+## 2                   -0.151 0.004885993      0.003          5  0.1543686
+## 3                   -0.250 0.003846154      0.002         47  1.0937864
+## 4                   -0.353 0.002525253      0.001         24  0.6232147
+## 5                   -0.353 0.002525253      0.001         24  0.6232147
+## 6                   -0.090 0.004792332      0.003          0  0.0000000
 ##   uncounted_hh
-## 1          693
-## 2          485
-## 3          689
-## 4          890
-## 5          890
-## 6          260</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co">### set up lep demog -- summarize to get lep by tract then select only tracts with higher than average lep</span></a>
-<a class="sourceLine" id="cb21-2" title="2">lep_quint &lt;-<span class="st"> </span></a>
-<a class="sourceLine" id="cb21-3" title="3">demog <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-4" title="4"><span class="st">  </span><span class="kw">filter</span>( subject <span class="op">==</span><span class="st">&quot;Language other than English&quot;</span> <span class="op">&amp;</span><span class="st"> </span>value <span class="op">!=</span><span class="st">&quot;Speak only English&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-5" title="5"><span class="st">  </span><span class="kw">group_by</span>(GEOID, subject) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-6" title="6"><span class="st"> </span><span class="kw">summarize</span>(<span class="dt">estimate =</span> <span class="kw">sum</span>(estimate, <span class="dt">na.rm =</span> T),</a>
-<a class="sourceLine" id="cb21-7" title="7">            <span class="dt">summary_est =</span> <span class="kw">mean</span>(summary_est, <span class="dt">na.rm =</span> T),</a>
-<a class="sourceLine" id="cb21-8" title="8">           <span class="dt">prc =</span> estimate<span class="op">/</span>summary_est) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-9" title="9"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">value =</span> <span class="st">&quot;LEP&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-10" title="10"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>summary_est) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-11" title="11"><span class="st">  </span></a>
-<a class="sourceLine" id="cb21-12" title="12"><span class="st">  </span><span class="co"># join the lep countywide stats</span></a>
-<a class="sourceLine" id="cb21-13" title="13"><span class="st">  </span><span class="kw">left_join</span>(countywide_lep_stats) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-14" title="14"></a>
-<a class="sourceLine" id="cb21-15" title="15"><span class="st">  </span><span class="co"># query only tracts where the % for that tract lep is greater than its mean </span></a>
-<a class="sourceLine" id="cb21-16" title="16"><span class="st">  </span><span class="kw">filter</span>(prc <span class="op">&gt;=</span><span class="st"> </span>quintile) <span class="op">%&gt;%</span><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-17" title="17"><span class="st">  </span></a>
-<a class="sourceLine" id="cb21-18" title="18"><span class="st">   </span><span class="co"># now join response rates</span></a>
-<a class="sourceLine" id="cb21-19" title="19"><span class="st">  </span><span class="kw">left_join</span>(change, <span class="dt">by=</span><span class="st">&quot;GEOID&quot;</span>)  <span class="op">%&gt;%</span></a>
-<a class="sourceLine" id="cb21-20" title="20"><span class="st"> </span></a>
-<a class="sourceLine" id="cb21-21" title="21"><span class="st">  </span><span class="co"># exclude high % group quarters tractss</span></a>
-<a class="sourceLine" id="cb21-22" title="22"><span class="st">  </span><span class="kw">filter</span>( gq_pop_pct <span class="op">&lt;</span><span class="st"> </span><span class="fl">50.0</span>) </a>
-<a class="sourceLine" id="cb21-23" title="23"></a>
-<a class="sourceLine" id="cb21-24" title="24"></a>
-<a class="sourceLine" id="cb21-25" title="25"></a>
-<a class="sourceLine" id="cb21-26" title="26"><span class="co">## combine lep and race to get one long df</span></a>
-<a class="sourceLine" id="cb21-27" title="27">race_quint &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(race_quint, lep_quint)</a>
-<a class="sourceLine" id="cb21-28" title="28"></a>
-<a class="sourceLine" id="cb21-29" title="29"><span class="kw">subset</span>(race_quint, GEOID <span class="op">==</span><span class="st">&quot;06037219800&quot;</span>)</a></code></pre></div>
+## 1          686
+## 2          481
+## 3          686
+## 4          888
+## 5          888
+## 6          258</code></pre>
+<div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="co">### set up lep demog -- summarize to get lep by tract then select only tracts with higher than average lep</span></a>
+<a class="sourceLine" id="cb19-2" title="2">lep_quint &lt;-<span class="st"> </span></a>
+<a class="sourceLine" id="cb19-3" title="3">demog <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-4" title="4"><span class="st">  </span><span class="kw">filter</span>( subject <span class="op">==</span><span class="st">&quot;Language other than English&quot;</span> <span class="op">&amp;</span><span class="st"> </span>value <span class="op">!=</span><span class="st">&quot;Speak only English&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-5" title="5"><span class="st">  </span><span class="kw">group_by</span>(GEOID, subject) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-6" title="6"><span class="st"> </span><span class="kw">summarize</span>(<span class="dt">estimate =</span> <span class="kw">sum</span>(estimate, <span class="dt">na.rm =</span> T),</a>
+<a class="sourceLine" id="cb19-7" title="7">            <span class="dt">summary_est =</span> <span class="kw">mean</span>(summary_est, <span class="dt">na.rm =</span> T),</a>
+<a class="sourceLine" id="cb19-8" title="8">           <span class="dt">prc =</span> estimate<span class="op">/</span>summary_est) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-9" title="9"><span class="st">  </span><span class="kw">mutate</span>(<span class="dt">value =</span> <span class="st">&quot;LEP&quot;</span>) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-10" title="10"><span class="st">  </span><span class="kw">select</span>(<span class="op">-</span>summary_est) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-11" title="11"><span class="st">  </span></a>
+<a class="sourceLine" id="cb19-12" title="12"><span class="st">  </span><span class="co"># join the lep countywide stats</span></a>
+<a class="sourceLine" id="cb19-13" title="13"><span class="st">  </span><span class="kw">left_join</span>(countywide_lep_stats) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-14" title="14"></a>
+<a class="sourceLine" id="cb19-15" title="15"><span class="st">  </span><span class="co"># query only tracts where the % for that tract lep is greater than its mean </span></a>
+<a class="sourceLine" id="cb19-16" title="16"><span class="st">  </span><span class="kw">filter</span>(prc <span class="op">&gt;=</span><span class="st"> </span>quintile) <span class="op">%&gt;%</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-17" title="17"><span class="st">  </span></a>
+<a class="sourceLine" id="cb19-18" title="18"><span class="st">   </span><span class="co"># now join response rates</span></a>
+<a class="sourceLine" id="cb19-19" title="19"><span class="st">  </span><span class="kw">left_join</span>(change, <span class="dt">by=</span><span class="st">&quot;GEOID&quot;</span>)  <span class="op">%&gt;%</span></a>
+<a class="sourceLine" id="cb19-20" title="20"><span class="st"> </span></a>
+<a class="sourceLine" id="cb19-21" title="21"><span class="st">  </span><span class="co"># exclude high % group quarters tractss</span></a>
+<a class="sourceLine" id="cb19-22" title="22"><span class="st">  </span><span class="kw">filter</span>( gq_pop_pct <span class="op">&lt;</span><span class="st"> </span><span class="fl">50.0</span>) </a>
+<a class="sourceLine" id="cb19-23" title="23"></a>
+<a class="sourceLine" id="cb19-24" title="24"></a>
+<a class="sourceLine" id="cb19-25" title="25"></a>
+<a class="sourceLine" id="cb19-26" title="26"><span class="co">## combine lep and race to get one long df</span></a>
+<a class="sourceLine" id="cb19-27" title="27">race_quint &lt;-<span class="st"> </span><span class="kw">bind_rows</span>(race_quint, lep_quint)</a>
+<a class="sourceLine" id="cb19-28" title="28"></a>
+<a class="sourceLine" id="cb19-29" title="29"><span class="kw">subset</span>(race_quint, GEOID <span class="op">==</span><span class="st">&quot;06037219800&quot;</span>)</a></code></pre></div>
 <pre><code>##           GEOID value        subject estimate      prc median_est
 ## 814 06037219800 Black Race-Ethnicity      546 0.194306        150
 ##     median_prc mean_est  mean_prc  quintile TRACTCE10 resp2020_converted.x
-## 814 0.03771088 351.2306 0.0802483 0.1115769    219800                0.464
+## 814 0.03771088 351.2306 0.0802483 0.1115769    219800                0.473
 ##         date.x neighbrhd_name NAME htc region region_name GEOID_city
-## 814 2020-06-03     West Adams 2198  79     10    South LA     644000
+## 814 2020-06-25     West Adams 2198  79     10    South LA     644000
 ##            city resp_house10 resp10_house10 housecur house10
-## 814 Los Angeles       464.83         628.32      989     952
+## 814 Los Angeles      473.731         628.32      989     952
 ##     resp2020_converted.y     date.y resp2010_converted
-## 814                 0.47 2020-06-18               0.66
+## 814                0.479 2020-07-15               0.66
 ##     resp10_20_diff_converted prc_change difference gq_pop_est gq_pop_pct
-## 814                    -0.19 0.01293103      0.006          5  0.1779359
+## 814                   -0.181 0.01268499      0.006          5  0.1779359
 ##     uncounted_hh
-## 814          524</code></pre>
-<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb23-1" title="1"><span class="co"># in this tract in West Adams/South LA, there are higher than average Black,Latinx, foreign born and LEP pop shares</span></a>
-<a class="sourceLine" id="cb23-2" title="2"></a>
-<a class="sourceLine" id="cb23-3" title="3"><span class="co">### Export the combined race/fb/lep demographic tract table -- WHERE TRACTS ARE IN TOP QUINTILE</span></a>
-<a class="sourceLine" id="cb23-4" title="4"><span class="kw">write.csv</span>(race_quint, <span class="kw">paste0</span>(wcl_root, <span class="st">&quot;Countywide Town Hall Reports/top_quintile_demographics_tract_refresh.csv&quot;</span>), <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
-<a class="sourceLine" id="cb23-5" title="5"></a>
-<a class="sourceLine" id="cb23-6" title="6"><span class="co">### Export the combined race/fb/lep demographic tract table -- WHERE TRACTS ARE IN TOP QUINTILE</span></a>
-<a class="sourceLine" id="cb23-7" title="7"><span class="kw">write.csv</span>(race_quint, <span class="kw">paste0</span>(wcl_root, <span class="st">&quot;Countywide Town Hall Reports/top_quintile_demographics_tract_&quot;</span>, data_date, <span class="st">&quot;.csv&quot;</span>), <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
+## 814          515</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co"># in this tract in West Adams/South LA, there are higher than average Black,Latinx, foreign born and LEP pop shares</span></a>
+<a class="sourceLine" id="cb21-2" title="2"></a>
+<a class="sourceLine" id="cb21-3" title="3"><span class="co">### Export the combined race/fb/lep demographic tract table -- WHERE TRACTS ARE IN TOP QUINTILE</span></a>
+<a class="sourceLine" id="cb21-4" title="4"><span class="kw">write.csv</span>(race_quint, <span class="kw">paste0</span>(wcl_root, <span class="st">&quot;Countywide Town Hall Reports/top_quintile_demographics_tract_refresh.csv&quot;</span>), <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a>
+<a class="sourceLine" id="cb21-5" title="5"></a>
+<a class="sourceLine" id="cb21-6" title="6"><span class="co">### Export the combined race/fb/lep demographic tract table -- WHERE TRACTS ARE IN TOP QUINTILE</span></a>
+<a class="sourceLine" id="cb21-7" title="7"><span class="kw">write.csv</span>(race_quint, <span class="kw">paste0</span>(wcl_root, <span class="st">&quot;Countywide Town Hall Reports/top_quintile_demographics_tract_&quot;</span>, data_date, <span class="st">&quot;.csv&quot;</span>), <span class="dt">row.names =</span> <span class="ot">FALSE</span>)</a></code></pre></div>
 </div>
 </div>
 
@@ -2160,7 +2069,7 @@ $(document).ready(function () {
 
 </script>
 
-<!---- tabsets ---->
+<!-- tabsets -->
 
 <script>
 $(document).ready(function () {
@@ -2174,7 +2083,7 @@ $(document).ready(function () {
 });
 </script>
 
-<!---- code folding ---->
+<!-- code folding -->
 
 <script>
 $(document).ready(function ()  {
@@ -2203,7 +2112,7 @@ $(document).ready(function ()  {
 });
 </script>
 
-<!---- dynamically load mathjax for compatibility with self-contained ---->
+<!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
   (function () {
     var script = document.createElement("script");
