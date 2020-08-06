@@ -1540,6 +1540,30 @@ con &lt;- dbConnect(drv, dbname = &quot;covid19_race_class&quot;,
 <p>Load version that is a materialized view because the view takes a very long time to load/to be queried</p>
 <pre class="r"><code>### load covid neighborhoods from postgres db
 #covid_sp &lt;- st_read(con, &quot;recent_lacounty_covid_case_rate_place_data_ld2&quot;)
+# 
+# covid_sp &lt;- st_read(con, query = &quot;SELECT DISTINCT ON (lacounty_covid_case_rate_place_data.lac_place_name) lacounty_covid_case_rate_place_data.lac_place_name,
+#     lacounty_covid_case_rate_place_data.date,
+#     lacounty_covid_case_rate_place_data.confirmed_cases,
+#     lacounty_covid_case_rate_place_data.cases_per100k,
+#     lacounty_covid_case_rate_place_data.total_population,
+#     lacounty_covid_case_rate_place_data.nh_white_pct,
+#     lacounty_covid_case_rate_place_data.nh_black_pct,
+#     lacounty_covid_case_rate_place_data.nh_asian_pct,
+#     lacounty_covid_case_rate_place_data.latino_pct,
+#     lacounty_covid_case_rate_place_data.nh_nhpi_pct,
+#     lacounty_covid_case_rate_place_data.nh_aian_pct,
+#     lacounty_covid_case_rate_place_data.nh_white_quantiles,
+#     lacounty_covid_case_rate_place_data.nh_black_quantiles,
+#     lacounty_covid_case_rate_place_data.nh_asian_quantiles,
+#     lacounty_covid_case_rate_place_data.latino_quantiles,
+#     lacounty_covid_case_rate_place_data.nh_aian_quantiles,
+#     lacounty_covid_case_rate_place_data.nh_nhpi_quantiles,
+#     lacounty_covid_case_rate_place_data.geom
+#    FROM lacounty_covid_case_rate_place_data
+#   WHERE lacounty_covid_case_rate_place_data.lac_place_name IS NOT NULL
+#   ORDER BY lacounty_covid_case_rate_place_data.lac_place_name, lacounty_covid_case_rate_place_data.date DESC&quot;)
+#   
+
 
 covid_sp &lt;- st_read(con, query = &quot;SELECT DISTINCT ON (lacounty_covid_case_rate_place_data.lac_place_name) lacounty_covid_case_rate_place_data.lac_place_name,
     lacounty_covid_case_rate_place_data.date,
@@ -1573,8 +1597,49 @@ plot(covid_sp$geom)</code></pre>
 <pre class="r"><code># check crs
 st_crs(covid_sp) # cool that&#39;s what we want</code></pre>
 <pre><code>## Coordinate Reference System:
-##   EPSG: 3310 
-##   proj4string: &quot;+proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs&quot;</code></pre>
+##   User input: EPSG:3310 
+##   wkt:
+## PROJCRS[&quot;NAD83 / California Albers&quot;,
+##     BASEGEOGCRS[&quot;NAD83&quot;,
+##         DATUM[&quot;North American Datum 1983&quot;,
+##             ELLIPSOID[&quot;GRS 1980&quot;,6378137,298.257222101,
+##                 LENGTHUNIT[&quot;metre&quot;,1]]],
+##         PRIMEM[&quot;Greenwich&quot;,0,
+##             ANGLEUNIT[&quot;degree&quot;,0.0174532925199433]],
+##         ID[&quot;EPSG&quot;,4269]],
+##     CONVERSION[&quot;California Albers&quot;,
+##         METHOD[&quot;Albers Equal Area&quot;,
+##             ID[&quot;EPSG&quot;,9822]],
+##         PARAMETER[&quot;Latitude of false origin&quot;,0,
+##             ANGLEUNIT[&quot;degree&quot;,0.0174532925199433],
+##             ID[&quot;EPSG&quot;,8821]],
+##         PARAMETER[&quot;Longitude of false origin&quot;,-120,
+##             ANGLEUNIT[&quot;degree&quot;,0.0174532925199433],
+##             ID[&quot;EPSG&quot;,8822]],
+##         PARAMETER[&quot;Latitude of 1st standard parallel&quot;,34,
+##             ANGLEUNIT[&quot;degree&quot;,0.0174532925199433],
+##             ID[&quot;EPSG&quot;,8823]],
+##         PARAMETER[&quot;Latitude of 2nd standard parallel&quot;,40.5,
+##             ANGLEUNIT[&quot;degree&quot;,0.0174532925199433],
+##             ID[&quot;EPSG&quot;,8824]],
+##         PARAMETER[&quot;Easting at false origin&quot;,0,
+##             LENGTHUNIT[&quot;metre&quot;,1],
+##             ID[&quot;EPSG&quot;,8826]],
+##         PARAMETER[&quot;Northing at false origin&quot;,-4000000,
+##             LENGTHUNIT[&quot;metre&quot;,1],
+##             ID[&quot;EPSG&quot;,8827]]],
+##     CS[Cartesian,2],
+##         AXIS[&quot;easting (X)&quot;,east,
+##             ORDER[1],
+##             LENGTHUNIT[&quot;metre&quot;,1]],
+##         AXIS[&quot;northing (Y)&quot;,north,
+##             ORDER[2],
+##             LENGTHUNIT[&quot;metre&quot;,1]],
+##     USAGE[
+##         SCOPE[&quot;unknown&quot;],
+##         AREA[&quot;USA - California&quot;],
+##         BBOX[32.53,-124.45,42.01,-114.12]],
+##     ID[&quot;EPSG&quot;,3310]]</code></pre>
 <pre class="r"><code># calc area of covid sp area
 covid_sp$area_neighb &lt;- st_area(covid_sp)</code></pre>
 </div>
@@ -1592,28 +1657,32 @@ covid_sp$area_neighb &lt;- st_area(covid_sp)</code></pre>
 <pre class="r"><code># get covid data date
 covid_date &lt;- max(unique(covid_sp$date))
 covid_date</code></pre>
-<pre><code>## [1] &quot;2020-07-16&quot;</code></pre>
+<pre><code>## [1] &quot;2020-08-02&quot;</code></pre>
 <pre class="r"><code># load self response rate data tract with covid date
-dat &lt;- fread(paste0(census_root, &quot;self_response/selfresp_tract_converted_&quot;, covid_date, &quot;.csv&quot;),  data.table=FALSE, stringsAsFactors = FALSE,
+# dat &lt;- fread(paste0(census_root, &quot;self_response/selfresp_tract_converted_&quot;, covid_date, &quot;.csv&quot;),  data.table=FALSE, stringsAsFactors = FALSE,
+#              colClasses = c(&quot;TRACTCE10&quot; = &quot;character&quot;, &quot;GEOID10&quot;=&quot;character&quot;))
+
+# Aug 3 is as close as it gets
+dat &lt;- fread(paste0(census_root, &quot;self_response/selfresp_tract_converted_2020-08-03.csv&quot;),  data.table=FALSE, stringsAsFactors = FALSE,
              colClasses = c(&quot;TRACTCE10&quot; = &quot;character&quot;, &quot;GEOID10&quot;=&quot;character&quot;))
 
 # query LA
 dat &lt;- dat[dat$GEOID10 %like% &quot;06037&quot;, ]
 head(dat) # review</code></pre>
 <pre><code>##      TRACTCE10     GEOID10 resp_house10 resp10_house10 housecur house10
-## 4194    101110 06037101110      909.720       1209.417     1596    1641
-## 4195    101122 06037101122      774.952       1017.600     1256    1325
-## 4198    101210 06037101210     1203.293       1444.469     2321    2150
-## 4199    101220 06037101220      698.760        879.676     1294    1246
-## 4200    101300 06037101300      750.505       1190.424     1435    1542
-## 4201    101400 06037101400      584.781       1123.500     1473    1498
+## 4194    101110 06037101110      922.488       1209.417     1596    1641
+## 4195    101122 06037101122      787.512       1017.600     1256    1325
+## 4198    101210 06037101210     1222.876       1444.469     2321    2150
+## 4199    101220 06037101220      709.112        879.676     1294    1246
+## 4200    101300 06037101300      760.550       1190.424     1435    1542
+## 4201    101400 06037101400      590.673       1123.500     1473    1498
 ##      resp2020_converted resp2010_converted respDiff_converted access_date
-## 4194          0.5700000          0.7370000         -0.1670000  2020-07-16
-## 4195          0.6170000          0.7680000         -0.1510000  2020-07-16
-## 4198          0.5184374          0.6718462         -0.1534088  2020-07-16
-## 4199          0.5400000          0.7060000         -0.1660000  2020-07-16
-## 4200          0.5230000          0.7720000         -0.2490000  2020-07-16
-## 4201          0.3970000          0.7500000         -0.3530000  2020-07-16</code></pre>
+## 4194          0.5780000          0.7370000         -0.1590000  2020-08-03
+## 4195          0.6270000          0.7680000         -0.1410000  2020-08-03
+## 4198          0.5268748          0.6718462         -0.1449714  2020-08-03
+## 4199          0.5480000          0.7060000         -0.1580000  2020-08-03
+## 4200          0.5300000          0.7720000         -0.2420000  2020-08-03
+## 4201          0.4010000          0.7500000         -0.3490000  2020-08-03</code></pre>
 </div>
 <div id="load-demographic-data" class="section level3">
 <h3>Load demographic data</h3>
@@ -1669,8 +1738,7 @@ tract10 &lt;- st_read(paste0(cb_root, &quot;/cb_2018_06_tract_500k/cb_2018_06_tr
 ## geometry type:  MULTIPOLYGON
 ## dimension:      XY
 ## bbox:           xmin: -124.4096 ymin: 32.53416 xmax: -114.1312 ymax: 42.00948
-## epsg (SRID):    4269
-## proj4string:    +proj=longlat +datum=NAD83 +no_defs</code></pre>
+## geographic CRS: NAD83</code></pre>
 <pre class="r"><code># limit columns and project to SRID 3310
 tract10 &lt;- tract10[tract10$COUNTYFP ==&quot;037&quot;, c(2, 5, 6)]
 tract10 &lt;- st_transform(tract10, 3310)</code></pre>
@@ -1687,7 +1755,7 @@ tract10$area_tract &lt;- st_area(tract10)</code></pre>
 <div id="step-1.-intersect-tracts-and-covid-neighborhood-geometries" class="section level3">
 <h3>Step 1. Intersect Tracts and COVID Neighborhood geometries</h3>
 <pre class="r"><code># intersect 
-int &lt;- st_intersection(covid_sp, tract10)</code></pre>
+int &lt;- st_intersection(st_make_valid(covid_sp), tract10)</code></pre>
 </div>
 <div id="step-2.-calculate-area-of-intersecting-polygons" class="section level3">
 <h3>Step 2. Calculate area of intersecting polygons</h3>
@@ -1706,13 +1774,12 @@ int[int$GEOID ==&quot;06037216200&quot;, c(1:4, 19:25)]</code></pre>
 ## geometry type:  GEOMETRY
 ## dimension:      XY
 ## bbox:           xmin: 151885 ymin: -439131.7 xmax: 153116.4 ymax: -437931.3
-## epsg (SRID):    3310
-## proj4string:    +proj=aea +lat_1=34 +lat_2=40.5 +lat_0=0 +lon_0=-120 +x_0=0 +y_0=-4000000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs
+## projected CRS:  NAD83 / California Albers
 ##         lac_place_name       date confirmed_cases cases_per100k COUNTYFP
-## 75.10     Hancock Park 2020-07-16             153      897.9400      037
-## 125.7         Mid-city 2020-07-16             195     1297.4052      037
-## 126.12    Miracle Mile 2020-07-16              99      550.4587      037
-## 184.2  Sycamore Square 2020-07-16               3            NA      037
+## 75.10     Hancock Park 2020-08-02             173      1015.318      037
+## 125.7         Mid-city 2020-08-02             235      1563.540      037
+## 126.12    Miracle Mile 2020-08-02             127       706.144      037
+## 184.2  Sycamore Square 2020-08-02               4            NA      037
 ##              GEOID NAME     area_tract                           geom
 ## 75.10  06037216200 2162 953705.2 [m^2] MULTIPOLYGON (((153116.4 -4...
 ## 125.7  06037216200 2162 953705.2 [m^2] MULTIPOLYGON (((152146.3 -4...
@@ -1720,9 +1787,9 @@ int[int$GEOID ==&quot;06037216200&quot;, c(1:4, 19:25)]</code></pre>
 ## 184.2  06037216200 2162 953705.2 [m^2] POLYGON ((153116.1 -438122....
 ##                     area_int          prc_int
 ## 75.10       0.08965227 [m^2] 0.00000009400417
-## 125.7     524.41619835 [m^2] 0.00054987243794
-## 126.12 788536.40207282 [m^2] 0.82681357893526
-## 184.2  164644.28289873 [m^2] 0.17263645462262</code></pre>
+## 125.7     524.41619881 [m^2] 0.00054987243842
+## 126.12 788536.40207136 [m^2] 0.82681357893399
+## 184.2  164644.28289943 [m^2] 0.17263645462341</code></pre>
 <ul>
 <li>We’ve got one tract intersecting 4 neighborhood polygons</li>
 <li>Looks like there is one neighborhood with ~82% of the tract area, one neighborhood with ~17% of the tract area.</li>
@@ -1780,25 +1847,25 @@ xwalk &lt;- full_join(dat, int_dissolve,
 </ul>
 <pre class="r"><code>subset(xwalk, GEOID10==&quot;06037216200&quot;)</code></pre>
 <pre><code>##      TRACTCE10     GEOID10 resp_house10 resp10_house10 housecur house10
-## 1519    216200 06037216200     1440.797       1662.672     2669    2475
-## 1520    216200 06037216200     1440.797       1662.672     2669    2475
-## 1521    216200 06037216200     1440.797       1662.672     2669    2475
-## 1522    216200 06037216200     1440.797       1662.672     2669    2475
+## 1519    216200 06037216200     1464.871       1662.672     2669    2475
+## 1520    216200 06037216200     1464.871       1662.672     2669    2475
+## 1521    216200 06037216200     1464.871       1662.672     2669    2475
+## 1522    216200 06037216200     1464.871       1662.672     2669    2475
 ##      resp2020_converted resp2010_converted respDiff_converted access_date
-## 1519          0.5398267          0.6717865         -0.1319598  2020-07-16
-## 1520          0.5398267          0.6717865         -0.1319598  2020-07-16
-## 1521          0.5398267          0.6717865         -0.1319598  2020-07-16
-## 1522          0.5398267          0.6717865         -0.1319598  2020-07-16
+## 1519          0.5488465          0.6717865           -0.12294  2020-08-03
+## 1520          0.5488465          0.6717865           -0.12294  2020-08-03
+## 1521          0.5488465          0.6717865           -0.12294  2020-08-03
+## 1522          0.5488465          0.6717865           -0.12294  2020-08-03
 ##       lac_place_name NAME              area_int     area_tract
 ## 1519    Hancock Park 2162      0.08965227 [m^2] 953705.2 [m^2]
-## 1520        Mid-city 2162    524.41619835 [m^2] 953705.2 [m^2]
-## 1521    Miracle Mile 2162 788536.40207282 [m^2] 953705.2 [m^2]
-## 1522 Sycamore Square 2162 164644.28289873 [m^2] 953705.2 [m^2]
+## 1520        Mid-city 2162    524.41619881 [m^2] 953705.2 [m^2]
+## 1521    Miracle Mile 2162 788536.40207136 [m^2] 953705.2 [m^2]
+## 1522 Sycamore Square 2162 164644.28289943 [m^2] 953705.2 [m^2]
 ##          area_neighb          prc_int
 ## 1519 5325585.0 [m^2] 0.00000009400417
-## 1520 2911421.5 [m^2] 0.00054987243794
-## 1521 3089830.4 [m^2] 0.82681357893526
-## 1522  170130.9 [m^2] 0.17263645462262</code></pre>
+## 1520 2911421.5 [m^2] 0.00054987243842
+## 1521 3089830.4 [m^2] 0.82681357893399
+## 1522  170130.9 [m^2] 0.17263645462341</code></pre>
 <ul>
 <li>See that the tract has the percent intersect joined to all the demographic and response rate info about the tract</li>
 </ul>
@@ -1816,9 +1883,9 @@ xwalk &lt;- full_join(dat, int_dissolve,
 <pre class="r"><code>subset(xwalk_htc_join, GEOID==&quot;06037216200&quot;)</code></pre>
 <pre><code>##       lac_place_name       GEOID NAME          prc_int CAHTCI_202
 ## 1419    Hancock Park 06037216200 2162 0.00000009400417         44
-## 2496        Mid-city 06037216200 2162 0.00054987243794         44
-## 2519    Miracle Mile 06037216200 2162 0.82681357893526         44
-## 3839 Sycamore Square 06037216200 2162 0.17263645462262         44</code></pre>
+## 2496        Mid-city 06037216200 2162 0.00054987243842         44
+## 2519    Miracle Mile 06037216200 2162 0.82681357893399         44
+## 3839 Sycamore Square 06037216200 2162 0.17263645462341         44</code></pre>
 <ul>
 <li>Because Miracle Mile is the neighborhood this tract most intersects with, we want to make sure this tract goes to that neighborhood.</li>
 </ul>
@@ -1923,12 +1990,12 @@ head(xwalk_summary)</code></pre>
 <pre><code>## # A tibble: 6 x 4
 ##   lac_place_name          resp_conv tot_conv   prc
 ##   &lt;chr&gt;                       &lt;dbl&gt;    &lt;dbl&gt; &lt;dbl&gt;
-## 1 Adams-Normandie           1170.     2382.  0.491
-## 2 Agoura Hills              5079.     6795.  0.748
-## 3 Alhambra                 20453.    29429.  0.695
-## 4 Alsace                    1652.     3416.  0.484
-## 5 Angeles National Forest      4.82     15.5 0.312
-## 6 Angelino Heights           414.      914.  0.453</code></pre>
+## 1 Adams-Normandie           1193.     2382.  0.501
+## 2 Agoura Hills              5135.     6795.  0.756
+## 3 Alhambra                 20781.    29429.  0.706
+## 4 Alsace                    1679.     3416.  0.491
+## 5 Angeles National Forest      4.88     15.5 0.316
+## 6 Angelino Heights           432.      914.  0.473</code></pre>
 <div id="summarize-htc" class="section level4">
 <h4>Summarize HTC</h4>
 <ul>
@@ -1988,19 +2055,19 @@ covid_sp %&gt;%
 <pre class="r"><code>data_date &lt;- unique(dat$access_date)[1]
 data_date &lt;- gsub(&quot;-&quot;, &quot;_&quot;, data_date)
 data_date</code></pre>
-<pre><code>## [1] &quot;2020_07_16&quot;</code></pre>
+<pre><code>## [1] &quot;2020_08_03&quot;</code></pre>
 <pre class="r"><code># EXPORT spatial files
 st_write(covid_resp, paste0(covidroot, &quot;covid_dem_resp_&quot;, data_date, &quot;.shp&quot;), driver = &quot;ESRI Shapefile&quot;, delete_dsn = TRUE)</code></pre>
-<pre><code>## Deleting source `W:/Project/RDA Team/COVID Census 2020/data/covid_dem_resp_2020_07_16.shp&#39; using driver `ESRI Shapefile&#39;
-## Writing layer `covid_dem_resp_2020_07_16&#39; to data source `W:/Project/RDA Team/COVID Census 2020/data/covid_dem_resp_2020_07_16.shp&#39; using driver `ESRI Shapefile&#39;
+<pre><code>## Deleting source `W:/Project/RDA Team/COVID Census 2020/data/covid_dem_resp_2020_08_03.shp&#39; using driver `ESRI Shapefile&#39;
+## Writing layer `covid_dem_resp_2020_08_03&#39; to data source `W:/Project/RDA Team/COVID Census 2020/data/covid_dem_resp_2020_08_03.shp&#39; using driver `ESRI Shapefile&#39;
 ## Writing 302 features with 22 fields and geometry type Unknown (any).</code></pre>
 <pre class="r"><code>st_write(covid_resp, paste0(covidroot, &quot;covid_dem_resp.shp&quot;), driver = &quot;ESRI Shapefile&quot;, delete_dsn = TRUE)</code></pre>
 <pre><code>## Deleting source `W:/Project/RDA Team/COVID Census 2020/data/covid_dem_resp.shp&#39; using driver `ESRI Shapefile&#39;
 ## Writing layer `covid_dem_resp&#39; to data source `W:/Project/RDA Team/COVID Census 2020/data/covid_dem_resp.shp&#39; using driver `ESRI Shapefile&#39;
 ## Writing 302 features with 22 fields and geometry type Unknown (any).</code></pre>
 <pre class="r"><code>st_write(covid_resp, paste0(covidroot, &quot;covid_dem_resp_&quot;, data_date, &quot;.geojson&quot;), driver = &quot;GeoJSON&quot;, delete_dsn = TRUE)</code></pre>
-<pre><code>## Deleting source `W:/Project/RDA Team/COVID Census 2020/data/covid_dem_resp_2020_07_16.geojson&#39; using driver `GeoJSON&#39;
-## Writing layer `covid_dem_resp_2020_07_16&#39; to data source `W:/Project/RDA Team/COVID Census 2020/data/covid_dem_resp_2020_07_16.geojson&#39; using driver `GeoJSON&#39;
+<pre><code>## Deleting source `W:/Project/RDA Team/COVID Census 2020/data/covid_dem_resp_2020_08_03.geojson&#39; using driver `GeoJSON&#39;
+## Writing layer `covid_dem_resp_2020_08_03&#39; to data source `W:/Project/RDA Team/COVID Census 2020/data/covid_dem_resp_2020_08_03.geojson&#39; using driver `GeoJSON&#39;
 ## Writing 302 features with 22 fields and geometry type Unknown (any).</code></pre>
 <pre class="r"><code>st_write(covid_resp, paste0(covidroot, &quot;covid_dem_resp.geojson&quot;), driver = &quot;GeoJSON&quot;, delete_dsn = TRUE)</code></pre>
 <pre><code>## Deleting source `W:/Project/RDA Team/COVID Census 2020/data/covid_dem_resp.geojson&#39; using driver `GeoJSON&#39;
