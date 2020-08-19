@@ -1619,7 +1619,7 @@ div.tocify {
 <a class="sourceLine" id="cb1-21" title="21"></a>
 <a class="sourceLine" id="cb1-22" title="22"><span class="co">#### HARD CODED DATE ####</span></a>
 <a class="sourceLine" id="cb1-23" title="23"><span class="co"># load most recent standardized data for full county</span></a>
-<a class="sourceLine" id="cb1-24" title="24">dat &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="kw">paste0</span>(wcl_root, <span class="st">&quot;convener_reports/standardized_data_test2020-08-05.csv&quot;</span>), <span class="dt">data.table =</span> <span class="ot">FALSE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>, </a>
+<a class="sourceLine" id="cb1-24" title="24">dat &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="kw">paste0</span>(wcl_root, <span class="st">&quot;convener_reports/standardized_data_test2020-08-19.csv&quot;</span>), <span class="dt">data.table =</span> <span class="ot">FALSE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>, </a>
 <a class="sourceLine" id="cb1-25" title="25">             <span class="dt">colClasses =</span> <span class="kw">c</span>(<span class="st">&quot;GEOID&quot;</span>=<span class="st">&quot;character&quot;</span>))</a>
 <a class="sourceLine" id="cb1-26" title="26"></a>
 <a class="sourceLine" id="cb1-27" title="27"><span class="co"># set up object for state rate</span></a>
@@ -1629,7 +1629,7 @@ div.tocify {
 <a class="sourceLine" id="cb1-31" title="31"></a>
 <a class="sourceLine" id="cb1-32" title="32"></a>
 <a class="sourceLine" id="cb1-33" title="33"><span class="co"># load most recent response rate/tract compare data</span></a>
-<a class="sourceLine" id="cb1-34" title="34">change &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="kw">paste0</span>(wcl_root, <span class="st">&quot;self_response/selfresp_tract_converted_change_2020-08-05.csv&quot;</span>), <span class="dt">data.table =</span> <span class="ot">FALSE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>,</a>
+<a class="sourceLine" id="cb1-34" title="34">change &lt;-<span class="st"> </span><span class="kw">fread</span>(<span class="kw">paste0</span>(wcl_root, <span class="st">&quot;self_response/selfresp_tract_converted_change_2020-08-19.csv&quot;</span>), <span class="dt">data.table =</span> <span class="ot">FALSE</span>, <span class="dt">stringsAsFactors =</span> <span class="ot">FALSE</span>,</a>
 <a class="sourceLine" id="cb1-35" title="35">                <span class="dt">colClasses =</span> <span class="kw">c</span>(<span class="st">&quot;GEOID&quot;</span>=<span class="st">&quot;character&quot;</span>))</a>
 <a class="sourceLine" id="cb1-36" title="36"></a>
 <a class="sourceLine" id="cb1-37" title="37"><span class="co"># calc uncounted hh--if household count is 0 make NA, otherwise subtracted est. # of hh that responded from total households</span></a>
@@ -1657,8 +1657,8 @@ div.tocify {
 <a class="sourceLine" id="cb1-59" title="59"></a>
 <a class="sourceLine" id="cb1-60" title="60"><span class="co"># query only LA Co, keep only columns with tract id and HTC score &amp; top 3 attributes contributing to HTC score</span></a>
 <a class="sourceLine" id="cb1-61" title="61">htc &lt;-<span class="st"> </span>htc[htc<span class="op">$</span>county_fip<span class="op">==</span><span class="st">&quot;037&quot;</span>, <span class="kw">c</span>(<span class="dv">3</span>, <span class="dv">17</span>, <span class="dv">41</span><span class="op">:</span><span class="dv">43</span>)]</a></code></pre></div>
-<div id="data-as-of-2020-08-05" class="section level4">
-<h4>Data as of 2020-08-05</h4>
+<div id="data-as-of-2020-08-19" class="section level4">
+<h4>Data as of 2020-08-19</h4>
 </div>
 <div id="summarize-htc-by-neighborhood" class="section level2">
 <h2>Summarize HTC by neighborhood</h2>
@@ -1746,12 +1746,12 @@ div.tocify {
 ## # Groups:   region_name [4]
 ##   region_name NAME  `Response Rate` `Uncounted Hous~ mean_htc count_htc
 ##   &lt;chr&gt;       &lt;chr&gt;           &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;
-## 1 Santa Clar~ Nort~            32                389     30          NA
-## 2 South LA    Univ~            35.1             3661     96.7         7
-## 3 Central LA  Down~            36.4            17984     91.6        13
-## 4 West LA     Mali~            36.5             3663     20          NA
-## 5 South LA    Hist~            37.9             6939     98.8        12
-## 6 West LA     Cent~            38.6              844     45          NA
+## 1 Santa Clar~ Nort~            32.4              387     30          NA
+## 2 South LA    Univ~            35.9             3614     96.7         7
+## 3 West LA     Mali~            37.3             3617     20          NA
+## 4 Central LA  Down~            37.6            17667     91.6        13
+## 5 South LA    Hist~            39.1             6802     98.8        12
+## 6 West LA     Cent~            39.7              829     45          NA
 ## # ... with 5 more variables: rank_resp &lt;dbl&gt;, rank_htc &lt;dbl&gt;,
 ## #   rank_cnthtc &lt;dbl&gt;, rank_uncthh &lt;int&gt;, rank_tot &lt;dbl&gt;</code></pre>
 </div>
@@ -1783,12 +1783,12 @@ div.tocify {
 ## # Groups:   region_name [3]
 ##   region_name NAME  `Response Rate` `Uncounted Hous~ mean_htc count_htc
 ##   &lt;chr&gt;       &lt;chr&gt;           &lt;dbl&gt;            &lt;dbl&gt;    &lt;dbl&gt;     &lt;int&gt;
-## 1 Central LA  Down~            36.4            17984     91.6        13
-## 2 South LA    Hist~            37.9             6939     98.8        12
-## 3 South LA    Cent~            41.5             5766     90.7        10
-## 4 Central LA  Pico~            42               8022    103.         14
-## 5 West LA     West~            45              10243     54           5
-## 6 Central LA  Holl~            45              21130     81.9        21
+## 1 Central LA  Down~            37.6            17667     91.6        13
+## 2 South LA    Hist~            39.1             6802     98.8        12
+## 3 South LA    Cent~            42.6             5659     90.7        10
+## 4 Central LA  Pico~            44.6             7656    103.         14
+## 5 West LA     West~            46.1            10036     54           5
+## 6 Central LA  Holl~            46.1            20701     81.9        21
 ## # ... with 5 more variables: rank_resp &lt;dbl&gt;, rank_htc &lt;dbl&gt;,
 ## #   rank_cnthtc &lt;dbl&gt;, rank_uncthh &lt;int&gt;, rank_tot &lt;dbl&gt;</code></pre>
 <div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># code broader neighborhood groups</span></a>
@@ -1953,40 +1953,40 @@ div.tocify {
 ## 5        663 0.170231264 1133.44075 0.269902728 0.54271560    101400
 ## 6        663 0.170231264 1133.44075 0.269902728 0.54271560    102103
 ##   resp2020_converted.x     date.x neighbrhd_name    NAME htc region
-## 1                0.572 2020-07-21        Tujunga 1011.10  48      6
-## 2                0.620 2020-07-21        Tujunga 1011.22  13      6
-## 3                0.525 2020-07-21        Tujunga 1013.00  15      6
-## 4                0.398 2020-07-21        Tujunga 1014.00  27      6
-## 5                0.398 2020-07-21        Tujunga 1014.00  27      6
-## 6                0.629 2020-07-21   Shadow Hills 1021.03  24      6
+## 1                0.579 2020-08-05        Tujunga 1011.10  48      6
+## 2                0.629 2020-08-05        Tujunga 1011.22  13      6
+## 3                0.531 2020-08-05        Tujunga 1013.00  15      6
+## 4                0.402 2020-08-05        Tujunga 1014.00  27      6
+## 5                0.402 2020-08-05        Tujunga 1014.00  27      6
+## 6                0.639 2020-08-05   Shadow Hills 1021.03  24      6
 ##           region_name GEOID_city        city resp_house10 resp10_house10
-## 1 San Fernando Valley     644000 Los Angeles      924.084       1209.417
-## 2 San Fernando Valley     644000 Los Angeles      790.024       1017.600
-## 3 San Fernando Valley     644000 Los Angeles      761.985       1190.424
-## 4 San Fernando Valley     644000 Los Angeles      592.146       1123.500
-## 5 San Fernando Valley     644000 Los Angeles      592.146       1123.500
-## 6 San Fernando Valley     644000 Los Angeles      444.744        452.970
+## 1 San Fernando Valley     644000 Los Angeles      943.236       1209.417
+## 2 San Fernando Valley     644000 Los Angeles      800.072       1017.600
+## 3 San Fernando Valley     644000 Los Angeles      772.030       1190.424
+## 4 San Fernando Valley     644000 Los Angeles      600.984       1123.500
+## 5 San Fernando Valley     644000 Los Angeles      600.984       1123.500
+## 6 San Fernando Valley     644000 Los Angeles      453.792        452.970
 ##   housecur house10 resp2020_converted.y     date.y resp2010_converted
-## 1     1596    1641                0.579 2020-08-05              0.737
-## 2     1256    1325                0.629 2020-08-05              0.768
-## 3     1435    1542                0.531 2020-08-05              0.772
-## 4     1473    1498                0.402 2020-08-05              0.750
-## 5     1473    1498                0.402 2020-08-05              0.750
-## 6      696     630                0.639 2020-08-05              0.719
+## 1     1596    1641                0.591 2020-08-19              0.737
+## 2     1256    1325                0.637 2020-08-19              0.768
+## 3     1435    1542                0.538 2020-08-19              0.772
+## 4     1473    1498                0.408 2020-08-19              0.750
+## 5     1473    1498                0.408 2020-08-19              0.750
+## 6      696     630                0.652 2020-08-19              0.719
 ##   resp10_20_diff_converted prc_change difference gq_pop_est gq_pop_pct
-## 1                   -0.158 0.01223776      0.007         95  2.2021326
-## 2                   -0.139 0.01451613      0.009          5  0.1543686
-## 3                   -0.241 0.01142857      0.006         47  1.0937864
-## 4                   -0.348 0.01005025      0.004         24  0.6232147
-## 5                   -0.348 0.01005025      0.004         24  0.6232147
-## 6                   -0.080 0.01589825      0.010          0  0.0000000
+## 1                   -0.146 0.02072539      0.012         95  2.2021326
+## 2                   -0.131 0.01271860      0.008          5  0.1543686
+## 3                   -0.234 0.01318267      0.007         47  1.0937864
+## 4                   -0.342 0.01492537      0.006         24  0.6232147
+## 5                   -0.342 0.01492537      0.006         24  0.6232147
+## 6                   -0.067 0.02034429      0.013          0  0.0000000
 ##   uncounted_hh
-## 1          672
-## 2          466
-## 3          673
-## 4          881
-## 5          881
-## 6          251</code></pre>
+## 1          653
+## 2          456
+## 3          663
+## 4          872
+## 5          872
+## 6          242</code></pre>
 <div class="sourceCode" id="cb19"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb19-1" title="1"><span class="co">### set up lep demog -- summarize to get lep by tract then select only tracts with higher than average lep</span></a>
 <a class="sourceLine" id="cb19-2" title="2">lep_quint &lt;-<span class="st"> </span></a>
 <a class="sourceLine" id="cb19-3" title="3">demog <span class="op">%&gt;%</span><span class="st"> </span></a>
@@ -2019,17 +2019,17 @@ div.tocify {
 <pre><code>##           GEOID value        subject estimate      prc median_est
 ## 814 06037219800 Black Race-Ethnicity      546 0.194306        150
 ##     median_prc mean_est  mean_prc  quintile TRACTCE10 resp2020_converted.x
-## 814 0.03771088 351.2306 0.0802483 0.1115769    219800                 0.48
+## 814 0.03771088 351.2306 0.0802483 0.1115769    219800                0.493
 ##         date.x neighbrhd_name NAME htc region region_name GEOID_city
-## 814 2020-07-21     West Adams 2198  79     10    South LA     644000
+## 814 2020-08-05     West Adams 2198  79     10    South LA     644000
 ##            city resp_house10 resp10_house10 housecur house10
-## 814 Los Angeles      487.577         628.32      989     952
+## 814 Los Angeles      497.467         628.32      989     952
 ##     resp2020_converted.y     date.y resp2010_converted
-## 814                0.493 2020-08-05               0.66
+## 814                0.503 2020-08-19               0.66
 ##     resp10_20_diff_converted prc_change difference gq_pop_est gq_pop_pct
-## 814                   -0.167 0.02708333      0.013          5  0.1779359
+## 814                   -0.157 0.02028398       0.01          5  0.1779359
 ##     uncounted_hh
-## 814          501</code></pre>
+## 814          492</code></pre>
 <div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb21-1" title="1"><span class="co"># in this tract in West Adams/South LA, there are higher than average Black,Latinx, foreign born and LEP pop shares</span></a>
 <a class="sourceLine" id="cb21-2" title="2"></a>
 <a class="sourceLine" id="cb21-3" title="3"><span class="co">### Export the combined race/fb/lep demographic tract table -- WHERE TRACTS ARE IN TOP QUINTILE</span></a>
